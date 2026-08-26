@@ -947,118 +947,92 @@ function selectCalc(type) {
 function calculatePrice() {
   const config = calcConfigs[currentCalc];
   const values = {};
-  let hasError = false;
   
   config.fields.forEach(f => {
     const el = document.getElementById(`field-${f.id}`);
-    const val = parseFloat(el.value);
-    if (isNaN(val) || val < (f.min || 0)) {
-      el.classList.add('error');
-      hasError = true;
-    } else {
-      el.classList.remove('error');
-      values[f.id] = val;
+    if (el) {
+      values[f.id] = parseFloat(el.value) || 0;
     }
   });
   
-  if (hasError) {
-    showToast('⚠️ Corrige los campos marcados en rojo');
-    return;
-  }
-  
   let price = 0, minPrice = 0, maxPrice = 0, margin = 0, breakeven = 0, advice = '';
   
-  try {
-    switch(currentCalc) {
-      case 'curso': {
-        const costPerStudent = (values.fixedCost / values.targetSales) + values.varCost;
-        price = costPerStudent / (1 - values.margin/100);
-        const valuePrice = values.value * (values.capture/100);
-        price = Math.min(price, valuePrice);
-        minPrice = price * 0.8;
-        maxPrice = price * 1.3;
-        margin = values.margin;
-        breakeven = Math.ceil(values.fixedCost / Math.max(1, price - values.varCost));
-        advice = `Con un valor percibido de $${values.value}, puedes posicionarte entre $${minPrice.toFixed(0)} y $${maxPrice.toFixed(0)}. El punto óptimo es $${price.toFixed(0)} para maximizar conversiones y margen.`;
-        break;
-      }
-      case 'ebook': {
-        const basePrice = (values.pages * 0.15) * (1 + values.niche/20);
-        price = basePrice * (1 + values.margin/100);
-        minPrice = price * 0.7;
-        maxPrice = price * 1.4;
-        margin = values.margin;
-        breakeven = Math.ceil(values.fixedCost / Math.max(1, price));
-        advice = `Ebooks de ${values.pages} páginas en nichos de competencia ${values.niche}/10 suelen venderse entre $${minPrice.toFixed(0)} y $${maxPrice.toFixed(0)}. Precio sugerido: $${price.toFixed(0)}.`;
-        break;
-      }
-      case 'membresia': {
-        const monthlyCost = (values.fixedCost / values.targetSales) + values.varCost;
-        const ltvFactor = 1 / (values.churn/100);
-        price = (values.ltv / ltvFactor) * (1 + values.margin/100);
-        price = Math.max(price, monthlyCost / (1 - values.margin/100));
-        minPrice = price * 0.85;
-        maxPrice = price * 1.25;
-        margin = values.margin;
-        breakeven = Math.ceil(values.fixedCost / Math.max(1, price - values.varCost));
-        advice = `Con churn del ${values.churn}%, el LTV es $${values.ltv}. Precio mensual óptimo: $${price.toFixed(0)}. Enfócate en retención para maximizar ganancias.`;
-        break;
-      }
-      case 'coaching': {
-        const hourlyRate = (values.experience * 50) + 100;
-        const costPerClient = (values.fixedCost / values.targetSales) + values.varCost;
-        price = Math.max(hourlyRate * 4, costPerClient / (1 - values.margin/100));
-        minPrice = price * 0.8;
-        maxPrice = price * 1.5;
-        margin = values.margin;
-        breakeven = Math.ceil(values.fixedCost / Math.max(1, price - values.varCost));
-        advice = `Con ${values.experience} años de experiencia, tu tarifa horaria base es $${hourlyRate}. Paquete mensual sugerido: $${price.toFixed(0)}.`;
-        break;
-      }
-      case 'webinar': {
-        const costPerAttendee = (values.fixedCost / values.targetSales) + values.varCost;
-        const expectedSales = values.targetSales * (values.conversion/100);
-        const revenuePerAttendee = values.upsell * (values.conversion/100);
-        price = Math.max(revenuePerAttendee * 0.3, costPerAttendee / (1 - values.margin/100));
-        minPrice = price * 0.5;
-        maxPrice = price * 2;
-        margin = values.margin;
-        breakeven = Math.ceil(values.fixedCost / Math.max(1, price * values.conversion/100 - values.varCost));
-        advice = `Con ${values.targetSales} asistentes y ${values.conversion}% de conversión, genera ~$${(expectedSales * values.upsell).toFixed(0)} en upsells. Precio del webinar: $${price.toFixed(0)} (o gratuito para maximizar upsells).`;
-        break;
-      }
+  switch(currentCalc) {
+    case 'curso': {
+      const costPerStudent = (values.fixedCost / values.targetSales) + values.varCost;
+      price = costPerStudent / (1 - values.margin/100);
+      const valuePrice = values.value * (values.capture/100);
+      price = Math.min(price, valuePrice);
+      minPrice = price * 0.8;
+      maxPrice = price * 1.3;
+      margin = values.margin;
+      breakeven = Math.ceil(values.fixedCost / Math.max(1, price - values.varCost));
+      advice = `Con un valor percibido de $${values.value}, puedes posicionarte entre $${minPrice.toFixed(0)} y $${maxPrice.toFixed(0)}. El punto óptimo es $${price.toFixed(0)}.`;
+      break;
     }
     
-    if (!isFinite(price) || price <= 0) {
-      throw new Error('Cálculo inválido');
+    case 'ebook': {
+      const basePrice = (values.pages * 0.15) * (1 + values.niche/20);
+      price = basePrice * (1 + values.margin/100);
+      minPrice = price * 0.7;
+      maxPrice = price * 1.4;
+      margin = values.margin;
+      breakeven = Math.ceil(values.fixedCost / Math.max(1, price));
+      advice = `Ebooks de ${values.pages} páginas en nichos de competencia ${values.niche}/10 suelen venderse entre $${minPrice.toFixed(0)} y $${maxPrice.toFixed(0)}. Precio sugerido: $${price.toFixed(0)}.`;
+      break;
     }
     
-    lastCalcResults = {
-      type: config.title,
-      price: price.toFixed(0),
-      min: minPrice.toFixed(0),
-      max: maxPrice.toFixed(0),
-      margin: margin.toFixed(0),
-      breakeven: breakeven,
-      advice: advice
-    };
+    case 'membresia': {
+      const monthlyCost = (values.fixedCost / values.targetSales) + values.varCost;
+      const ltvFactor = 1 / (values.churn/100);
+      price = (values.ltv / ltvFactor) * (1 + values.margin/100);
+      price = Math.max(price, monthlyCost / (1 - values.margin/100));
+      minPrice = price * 0.85;
+      maxPrice = price * 1.25;
+      margin = values.margin;
+      breakeven = Math.ceil(values.fixedCost / Math.max(1, price - values.varCost));
+      advice = `Con churn del ${values.churn}%, el LTV es $${values.ltv}. Precio mensual óptimo: $${price.toFixed(0)}.`;
+      break;
+    }
     
-    document.getElementById('resultPrice').textContent = `$${price.toFixed(0)}`;
-    document.getElementById('resultMin').textContent = `$${minPrice.toFixed(0)}`;
-    document.getElementById('resultMax').textContent = `$${maxPrice.toFixed(0)}`;
-    document.getElementById('resultMargin').textContent = `${margin.toFixed(0)}%`;
-    document.getElementById('resultBreakeven').textContent = `${breakeven} ventas`;
-    document.getElementById('resultAdvice').textContent = advice;
-    document.getElementById('resultSubtitle').textContent = `Precio sugerido para ${config.title}`;
+    case 'coaching': {
+      const hourlyRate = (values.experience * 50) + 100;
+      const costPerClient = (values.fixedCost / values.targetSales) + values.varCost;
+      price = Math.max(hourlyRate * 4, costPerClient / (1 - values.margin/100));
+      minPrice = price * 0.8;
+      maxPrice = price * 1.5;
+      margin = values.margin;
+      breakeven = Math.ceil(values.fixedCost / Math.max(1, price - values.varCost));
+      advice = `Con ${values.experience} años de experiencia, tu tarifa horaria base es $${hourlyRate}. Paquete mensual sugerido: $${price.toFixed(0)}.`;
+      break;
+    }
     
-    document.getElementById('resultCard').classList.remove('hidden');
-    document.getElementById('emptyResult').classList.add('hidden');
-    
-    showToast('✅ Cálculo completado con éxito');
-  } catch (err) {
-    showToast('❌ Error en el cálculo. Revisa los valores.');
-    console.error(err);
+    case 'webinar': {
+      const costPerAttendee = (values.fixedCost / values.targetSales) + values.varCost;
+      const expectedSales = values.targetSales * (values.conversion/100);
+      const revenuePerAttendee = values.upsell * (values.conversion/100);
+      price = Math.max(revenuePerAttendee * 0.3, costPerAttendee / (1 - values.margin/100));
+      minPrice = price * 0.5;
+      maxPrice = price * 2;
+      margin = values.margin;
+      breakeven = Math.ceil(values.fixedCost / Math.max(1, price * values.conversion/100 - values.varCost));
+      advice = `Con ${values.targetSales} asistentes y ${values.conversion}% de conversión, genera ~$${(expectedSales * values.upsell).toFixed(0)} en upsells.`;
+      break;
+    }
   }
+  
+  document.getElementById('resultPrice').textContent = `$${price.toFixed(0)}`;
+  document.getElementById('resultMin').textContent = `$${minPrice.toFixed(0)}`;
+  document.getElementById('resultMax').textContent = `$${maxPrice.toFixed(0)}`;
+  document.getElementById('resultMargin').textContent = `${margin.toFixed(0)}%`;
+  document.getElementById('resultBreakeven').textContent = `${breakeven} ventas`;
+  document.getElementById('resultAdvice').textContent = advice;
+  document.getElementById('resultSubtitle').textContent = `Precio sugerido para ${config.title}`;
+  
+  document.getElementById('resultCard').classList.remove('hidden');
+  document.getElementById('emptyResult').classList.add('hidden');
+  
+  showToast('✅ Cálculo completado');
 }
 
 // ============================================================

@@ -701,6 +701,8 @@ function updateLicenseUI() {
     status.classList.remove('hidden');
     status.classList.add('flex');
     text.innerHTML = '<i class="fas fa-crown text-amber-400 mr-1"></i> PRO Activo';
+    const lock = document.getElementById('premiumLock');
+    if (lock) lock.classList.add('hidden');
   } else {
     text.textContent = 'Modo Free';
   }

@@ -268,7 +268,7 @@
 
     <div class="grid lg:grid-cols-2 gap-8">
       <div class="glass rounded-2xl p-8 relative">
-        <div id="premiumLock" class="lock-overlay hidden">
+        <div id="premiumLock" class="lock-overlay hidden" style="display: none;">
           <div class="text-center">
             <i class="fas fa-lock text-4xl text-amber-400 mb-3"></i>
             <p class="font-bold mb-2">Función Premium</p>
@@ -702,7 +702,7 @@ function updateLicenseUI() {
     status.classList.add('flex');
     text.innerHTML = '<i class="fas fa-crown text-amber-400 mr-1"></i> PRO Activo';
     const lock = document.getElementById('premiumLock');
-    if (lock) lock.classList.add('hidden');
+    if (lock) { lock.classList.add('hidden'); lock.style.display = 'none'; }
   } else {
     text.textContent = 'Modo Free';
   }

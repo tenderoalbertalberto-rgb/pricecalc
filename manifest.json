@@ -1,16 +1,24 @@
 {
   "name": "PriceCalc Pro",
   "short_name": "PriceCalc",
-  "description": "Fija el precio perfecto para tu infoproducto",
-  "start_url": "./pricecalc.html",
+  "description": "Fija el precio perfecto para tu infoproducto en segundos",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f0720",
-  "theme_color": "#5B21B6",
+  "theme_color": "#764ba2",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "https://image.qwenlm.ai/public_source/676fe2fd-a25f-4b28-b652-388736773e2d/139a91b4a-5aea-4a20-b701-ee5ffc338932.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/2933/2933245.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2933/2933245.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

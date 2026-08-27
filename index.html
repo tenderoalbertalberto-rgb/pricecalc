@@ -12,7 +12,6 @@
 <style>
   * { font-family: system-ui, sans-serif; box-sizing: border-box; }
   body { background: #0f0720; color: #fff; margin: 0; overflow-x: hidden; }
-  body.modal-open { overflow: hidden !important; position: fixed !important; width: 100%; height: 100%; }
   .gradient-bg { background: linear-gradient(135deg, #1e1b4b 0%, #5B21B6 50%, #7C3AED 100%); }
   .gradient-gold { background: linear-gradient(135deg, #F59E0B 0%, #FCD34D 100%); }
   .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
@@ -51,29 +50,38 @@
   .btn-pdf { background: linear-gradient(135deg, #EF4444, #DC2626); color: white; }
   .btn-pdf:hover { box-shadow: 0 10px 30px rgba(239,68,68,0.4); }
 
-  /* MODAL FIX - Solución definitiva al scroll */
+  /* MODAL - SOLUCIÓN DEFINITIVA */
   #licenseModal {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 9999 !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    touch-action: none !important;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 99999;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
-  #licenseModal .modal-content {
+  
+  #licenseModal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  #licenseModal .modal-inner {
     position: relative;
-    z-index: 10000;
-    margin: auto;
-    max-width: 500px;
+    z-index: 100000;
     width: 90%;
+    max-width: 500px;
+    margin: 20px auto;
   }
-  #licenseModal.show {
-    display: flex !important;
+  
+  /* Prevenir scroll cuando el modal está activo */
+  body.modal-active {
+    overflow: hidden;
   }
 </style>
 </head>
@@ -113,7 +121,7 @@
       
       <!-- Contador Regresivo -->
       <div class="glass-gold rounded-xl p-4 mb-6 text-center border border-amber-400/30">
-        <p class="text-amber-300 font-bold text-lg mb-1">⏳ Oferta de lanzamiento termina en:</p>
+        <p class="text-amber-300 font-bold text-lg mb-1"> Oferta de lanzamiento termina en:</p>
         <p id="countdown" class="text-3xl font-black text-white tracking-wider">00d 00h 00m 00s</p>
       </div>
 
@@ -152,16 +160,16 @@
     <div class="text-center mb-12"><h2 class="text-3xl font-black mb-4">Calculadora <span class="text-amber-400">especializada</span></h2></div>
     
     <div class="flex flex-wrap gap-2 mb-8 justify-center">
-      <button type="button" onclick="switchCalc('curso')" id="tab-curso" class="tab tab-active px-5 py-3 rounded-xl">📊 Curso</button>
+      <button type="button" onclick="switchCalc('curso')" id="tab-curso" class="tab tab-active px-5 py-3 rounded-xl"> Curso</button>
       <button type="button" onclick="switchCalc('ebook')" id="tab-ebook" class="tab px-5 py-3 rounded-xl">📚 Ebook</button>
-      <button type="button" onclick="switchCalc('membresia')" id="tab-membresia" class="tab px-5 py-3 rounded-xl">👑 Membresía</button>
+      <button type="button" onclick="switchCalc('membresia')" id="tab-membresia" class="tab px-5 py-3 rounded-xl"> Membresía</button>
       <button type="button" onclick="switchCalc('coaching')" id="tab-coaching" class="tab px-5 py-3 rounded-xl">👥 Coaching</button>
-      <button type="button" onclick="switchCalc('webinar')" id="tab-webinar" class="tab px-5 py-3 rounded-xl">🎤 Webinar</button>
+      <button type="button" onclick="switchCalc('webinar')" id="tab-webinar" class="tab px-5 py-3 rounded-xl"> Webinar</button>
     </div>
 
     <div class="grid lg:grid-cols-2 gap-8">
       <div class="card">
-        <h3 id="calcTitle" class="text-2xl font-bold mb-6">📊 Curso Online</h3>
+        <h3 id="calcTitle" class="text-2xl font-bold mb-6"> Curso Online</h3>
         <div id="calcForm" class="space-y-4"></div>
         <button type="button" onclick="calculate()" class="btn mt-6"><i class="fas fa-rocket mr-2"></i>Calcular precio óptimo</button>
       </div>
@@ -386,10 +394,10 @@
   </div>
 </footer>
 
-<!-- Modal Licencia - VERSIÓN CORREGIDA -->
+<!-- Modal Licencia - VERSIÓN FINAL CORREGIDA -->
 <div id="licenseModal">
-  <div class="modal-content glass rounded-2xl p-8 relative border border-amber-400/30">
-    <button type="button" id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-white" style="background: none; border: none; cursor: pointer; font-size: 1.5rem;">
+  <div class="modal-inner glass rounded-2xl p-8 relative border border-amber-400/30">
+    <button type="button" id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-white" style="background: none; border: none; cursor: pointer; font-size: 1.5rem; padding: 0;">
       <i class="fas fa-times"></i>
     </button>
     <div class="text-center mb-6">
@@ -419,35 +427,14 @@ const LICENSE_URL = 'https://raw.githubusercontent.com/tenderoalbertalberto-rgb/
 let currentCalc = 'curso';
 let deferredPrompt;
 let isPro = false;
-let scrollPosition = 0;
 
 // ==========================================
-// 2. SISTEMA DE MODAL CORREGIDO (SIN SCROLL)
+// 2. FUNCIONES DEL MODAL (SOLUCIÓN DEFINITIVA)
 // ==========================================
-function openModal(e) {
-  // Prevenir cualquier comportamiento por defecto
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
-  }
-  
+function openModal() {
   const modal = document.getElementById('licenseModal');
-  
-  // Guardar posición del scroll
-  scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-  
-  // Bloquear scroll del body de forma robusta
-  document.body.classList.add('modal-open');
-  document.documentElement.style.overflow = 'hidden';
-  document.body.style.overflow = 'hidden';
-  document.body.style.position = 'fixed';
-  document.body.style.top = `-${scrollPosition}px`;
-  document.body.style.width = '100%';
-  
-  // Mostrar modal
-  modal.classList.add('show');
-  modal.classList.remove('hidden');
+  modal.classList.add('active');
+  document.body.classList.add('modal-active');
   
   // Limpiar estados
   document.getElementById('licenseError').classList.add('hidden');
@@ -458,27 +445,12 @@ function openModal(e) {
   setTimeout(() => {
     document.getElementById('licenseInput').focus();
   }, 100);
-  
-  return false;
 }
 
 function closeModal() {
   const modal = document.getElementById('licenseModal');
-  modal.classList.remove('show');
-  modal.classList.add('hidden');
-  
-  // Restaurar scroll del body
-  document.body.classList.remove('modal-open');
-  document.documentElement.style.overflow = '';
-  document.body.style.overflow = '';
-  document.body.style.position = '';
-  document.body.style.top = '';
-  document.body.style.width = '';
-  
-  // Restaurar posición del scroll
-  window.scrollTo(0, scrollPosition);
-  
-  return false;
+  modal.classList.remove('active');
+  document.body.classList.remove('modal-active');
 }
 
 // ==========================================
@@ -612,7 +584,7 @@ updateCountdown();
 // ==========================================
 const configs = {
   curso: {
-    title: ' Curso Online',
+    title: '📊 Curso Online',
     fields: [
       {id: 'fixed', label: 'Costos fijos totales ($)', value: 2000, desc: 'Grabación, plataforma, marketing'},
       {id: 'var', label: 'Costo variable por alumno ($)', value: 10, desc: 'Soporte, certificados'},
@@ -1091,109 +1063,73 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCountdown();
   
   // ==========================================
-  // EVENT LISTENERS PARA MODAL (SOLUCIÓN DEFINITIVA)
+  // EVENT LISTENERS PARA MODAL
   // ==========================================
   
   // Botón "Comprar PRO" del hero
-  const btnComprarPro = document.getElementById('btnComprarPro');
-  if (btnComprarPro) {
-    btnComprarPro.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      openModal(e);
-      return false;
-    });
-  }
+  document.getElementById('btnComprarPro').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    openModal();
+  });
   
   // Botón "Activar PRO" del header
-  const activateBtn = document.getElementById('activateBtn');
-  if (activateBtn) {
-    activateBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      openModal(e);
-      return false;
-    });
-  }
+  document.getElementById('activateBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    openModal();
+  });
   
   // Botones "Activar PRO" en las secciones premium bloqueadas
   document.querySelectorAll('.btn-activar-pro').forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
-      openModal(e);
-      return false;
+      openModal();
     });
   });
   
   // Click en los overlays de las secciones premium
   document.querySelectorAll('.premium-lock-overlay').forEach(overlay => {
     overlay.addEventListener('click', function(e) {
-      // Solo abrir si se hizo clic en el overlay, no en el botón
-      if (e.target === this || e.target.closest('.btn-activar-pro') === null) {
+      if (e.target === this) {
         e.preventDefault();
-        e.stopPropagation();
-        openModal(e);
+        openModal();
       }
     });
   });
   
   // Botón cerrar del modal
-  const closeModalBtn = document.getElementById('closeModalBtn');
-  if (closeModalBtn) {
-    closeModalBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      closeModal();
-      return false;
-    });
-  }
+  document.getElementById('closeModalBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    closeModal();
+  });
   
   // Botón verificar licencia
-  const verifyLicenseBtn = document.getElementById('verifyLicenseBtn');
-  if (verifyLicenseBtn) {
-    verifyLicenseBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      const codigo = document.getElementById('licenseInput').value.trim().toUpperCase();
-      verificarLicencia(codigo);
-      return false;
-    });
-  }
+  document.getElementById('verifyLicenseBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const codigo = document.getElementById('licenseInput').value.trim().toUpperCase();
+    verificarLicencia(codigo);
+  });
   
   // Cerrar modal al hacer clic fuera (en el fondo)
-  const modal = document.getElementById('licenseModal');
-  if (modal) {
-    modal.addEventListener('click', function(e) {
-      if (e.target === this) {
-        closeModal();
-      }
-    });
-  }
+  document.getElementById('licenseModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeModal();
+    }
+  });
   
   // Cerrar modal con tecla ESC
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
       const modal = document.getElementById('licenseModal');
-      if (modal && modal.classList.contains('show')) {
+      if (modal && modal.classList.contains('active')) {
         closeModal();
       }
     }
   });
-  
-  // Prevenir scroll con rueda del mouse cuando el modal está abierto
-  modal.addEventListener('wheel', function(e) {
-    if (e.target === this) {
-      e.preventDefault();
-    }
-  }, { passive: false });
-  
-  // Prevenir scroll táctil cuando el modal está abierto
-  modal.addEventListener('touchmove', function(e) {
-    if (e.target === this) {
-      e.preventDefault();
-    }
-  }, { passive: false });
 });
 </script>
 </body>

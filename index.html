@@ -4,662 +4,361 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="theme-color" content="#5B21B6">
-<title>PriceCalc Pro - Fija el precio perfecto para tu infoproducto</title>
-<meta name="description" content="La calculadora premium para creadores de Hotmart.">
+<title>PriceCalc Pro - Fija el precio perfecto</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM3QzNBRUQiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM1QjIxQjYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEyOCIgZmlsbD0idXJsKCNnKSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTUlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjgwIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0Y1OUUwQiI+UDwvdGV4dD48L3N2Zz4=">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="PriceCalc Pro">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  * { font-family: 'Poppins', system-ui, sans-serif; box-sizing: border-box; }
-  body { background: #0f0720; color: #fff; overflow-x: hidden; margin: 0; }
+  * { font-family: system-ui, sans-serif; box-sizing: border-box; }
+  body { background: #0f0720; color: #fff; margin: 0; overflow-x: hidden; }
   .gradient-bg { background: linear-gradient(135deg, #1e1b4b 0%, #5B21B6 50%, #7C3AED 100%); }
-  .gradient-gold { background: linear-gradient(135deg, #F59E0B 0%, #FCD34D 50%, #F59E0B 100%); }
-  .gradient-purple { background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%); }
-  .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
-  .glass-gold { background: rgba(245,158,11,0.08); backdrop-filter: blur(20px); border: 1px solid rgba(245,158,11,0.2); }
-  .glow { box-shadow: 0 0 40px rgba(124,58,237,0.4); }
+  .gradient-gold { background: linear-gradient(135deg, #F59E0B 0%, #FCD34D 100%); }
+  .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+  .glass-gold { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); }
   .tab-active { background: linear-gradient(135deg, #F59E0B, #FCD34D); color: #1e1b4b; font-weight: 700; }
-  .tab-inactive { background: rgba(255,255,255,0.05); color: #a78bfa; }
-  .tab-inactive:hover { background: rgba(255,255,255,0.1); color: #fff; }
-  .btn-primary { background: linear-gradient(135deg, #F59E0B, #FCD34D); color: #1e1b4b; font-weight: 700; transition: all 0.3s; border: none; cursor: pointer; }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(245,158,11,0.4); }
-  .btn-primary:active { transform: translateY(0); }
-  .btn-secondary { background: linear-gradient(135deg, #7C3AED, #5B21B6); color: #fff; font-weight: 600; transition: all 0.3s; border: none; cursor: pointer; }
-  .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(124,58,237,0.4); }
-  .input-field { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; transition: all 0.3s; width: 100%; padding: 0.75rem 1rem; border-radius: 0.75rem; }
-  .input-field:focus { border-color: #F59E0B; box-shadow: 0 0 0 3px rgba(245,158,11,0.2); outline: none; }
-  .input-field.error { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.2); }
-  .card-hover { transition: all 0.3s; }
-  .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(124,58,237,0.3); }
-  .fade-in { animation: fadeIn 0.5s ease-in; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .tab { background: rgba(255,255,255,0.05); color: #a78bfa; }
+  .tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .btn { background: linear-gradient(135deg, #F59E0B, #FCD34D); color: #1e1b4b; padding: 1rem; border-radius: 0.75rem; border: none; cursor: pointer; font-weight: 700; width: 100%; font-size: 1.1rem; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(245,158,11,0.4); }
+  .input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.75rem; border-radius: 0.5rem; width: 100%; }
+  .input:focus { border-color: #F59E0B; outline: none; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 2rem; }
+  .result-card { background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(124,58,237,0.1)); border: 1px solid rgba(245,158,11,0.3); border-radius: 1rem; padding: 2rem; }
+  .hidden { display: none !important; }
   @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
   .float { animation: float 3s ease-in-out infinite; }
-  @keyframes pulse-gold { 0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); } 50% { box-shadow: 0 0 0 15px rgba(245,158,11,0); } }
-  .pulse-gold { animation: pulse-gold 2s infinite; }
-  .lock-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(15,7,32,0.7); z-index: 10; border-radius: 1rem; }
   .hero-blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3; }
-  .result-card { background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(124,58,237,0.1)); border: 1px solid rgba(245,158,11,0.3); }
-  .scenario-card { transition: all 0.3s; }
-  .scenario-card:hover { transform: scale(1.02); }
-  .scenario-recommended { border: 2px solid #F59E0B; box-shadow: 0 0 30px rgba(245,158,11,0.3); }
-  .install-banner { background: linear-gradient(135deg, #F59E0B, #FCD34D); color: #1e1b4b; }
-  input[type="range"] { -webkit-appearance: none; appearance: none; height: 8px; background: rgba(255,255,255,0.1); border-radius: 5px; outline: none; }
-  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background: #F59E0B; border-radius: 50%; cursor: pointer; }
-  input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; background: #F59E0B; border-radius: 50%; cursor: pointer; border: none; }
-  select.input-field { cursor: pointer; }
-  select.input-field option { background: #1e1b4b; color: #fff; }
-  @media (max-width: 640px) {
-    .hero-title { font-size: 2rem !important; }
-    .section-padding { padding: 2rem 1rem !important; }
-  }
-  .toast-enter { animation: slideIn 0.3s ease-out; }
-  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-  .spinner { border: 3px solid rgba(255,255,255,0.2); border-top-color: #F59E0B; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; display: inline-block; }
-  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
-<body class="scroll-smooth">
-
-<!-- Install PWA Banner -->
-<div id="installBanner" class="install-banner fixed top-0 left-0 right-0 z-50 px-4 py-3 flex items-center justify-between hidden">
-  <div class="flex items-center gap-3">
-    <i class="fas fa-mobile-alt text-2xl"></i>
-    <div>
-      <p class="font-bold text-sm">Instala PriceCalc Pro</p>
-      <p class="text-xs opacity-80">Acceso rápido desde tu móvil</p>
-    </div>
-  </div>
-  <div class="flex gap-2">
-    <button onclick="installPWA()" class="bg-purple-900 text-white px-4 py-2 rounded-lg text-sm font-bold">Instalar</button>
-    <button onclick="document.getElementById('installBanner').classList.add('hidden')" class="text-purple-900 px-2"><i class="fas fa-times"></i></button>
-  </div>
-</div>
+<body>
 
 <!-- Header -->
 <header class="fixed top-0 left-0 right-0 z-40 glass border-b border-purple-500/20">
   <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl gradient-purple flex items-center justify-center font-black text-xl text-amber-400">P</div>
-      <div>
-        <h1 class="font-bold text-lg leading-tight">PriceCalc <span class="text-amber-400">Pro</span></h1>
-        <p class="text-xs text-purple-300 hidden sm:block">Fija el precio perfecto</p>
-      </div>
+      <div class="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center font-black text-xl text-amber-400">P</div>
+      <div><h1 class="font-bold text-lg">PriceCalc <span class="text-amber-400">Pro</span></h1></div>
     </div>
-    <div class="flex items-center gap-2 sm:gap-3">
-      <button id="installAppBtn" onclick="installPWA()" class="hidden btn-primary px-3 py-2 rounded-lg text-sm">
-        <i class="fas fa-download mr-1"></i><span class="hidden sm:inline">Instalar App</span>
-      </button>
+    <div class="flex items-center gap-3">
       <div id="licenseStatus" class="hidden items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold glass-gold">
-        <i class="fas fa-crown text-amber-400"></i>
-        <span id="licenseText">Modo Free</span>
+        <i class="fas fa-crown text-amber-400"></i><span id="licenseText">PRO Activo</span>
       </div>
-      <button onclick="openLicenseModal()" class="btn-secondary px-4 py-2 rounded-lg text-sm">
-        <i class="fas fa-key mr-1"></i><span class="hidden sm:inline">Activar</span>
-      </button>
+      <button onclick="openModal()" class="btn px-4 py-2 text-sm w-auto"><i class="fas fa-key mr-1"></i>Activar</button>
     </div>
   </div>
 </header>
 
-<!-- Hero Section -->
-<section class="relative min-h-screen flex items-center pt-24 pb-16 px-4 overflow-hidden">
+<!-- Hero -->
+<section class="relative min-h-screen flex items-center pt-20 pb-16 px-4">
   <div class="hero-blob w-96 h-96 bg-purple-600 top-20 -left-20"></div>
   <div class="hero-blob w-96 h-96 bg-amber-500 bottom-20 -right-20"></div>
-  
   <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
-    <div class="fade-in">
+    <div>
       <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-gold mb-6">
-        <i class="fas fa-star text-amber-400"></i>
-        <span class="text-sm font-semibold text-amber-300">+10,000 creadores de Hotmart confían en nosotros</span>
+        <i class="fas fa-star text-amber-400"></i><span class="text-sm font-semibold">+10,000 creadores confían en nosotros</span>
       </div>
-      <h1 class="hero-title text-4xl md:text-6xl font-black mb-6 leading-tight">
-        Fija el <span class="text-amber-400">precio perfecto</span> para tu infoproducto en segundos
-      </h1>
-      <p class="text-lg text-purple-200 mb-8 leading-relaxed">
-        5 calculadoras especializadas, generador de estrategia y simulador de ingresos. 
-        Deja de adivinar y empieza a <strong class="text-amber-400">vender con confianza</strong>.
-      </p>
-      <div class="flex flex-wrap gap-4 mb-8">
-        <a href="#calculadoras" class="btn-primary px-8 py-4 rounded-xl text-base pulse-gold inline-block text-center">
-          <i class="fas fa-rocket mr-2"></i>Empezar gratis
-        </a>
-        <a href="#copy-ventas" class="btn-secondary px-8 py-4 rounded-xl text-base inline-block text-center">
-          <i class="fas fa-shopping-cart mr-2"></i>Comprar PRO - $9.90
-        </a>
-      </div>
-      <div class="flex flex-wrap gap-6 text-sm text-purple-300">
-        <div class="flex items-center gap-2"><i class="fas fa-check text-amber-400"></i>Sin tarjeta de crédito</div>
-        <div class="flex items-center gap-2"><i class="fas fa-check text-amber-400"></i>Garantía 7 días</div>
-        <div class="flex items-center gap-2"><i class="fas fa-check text-amber-400"></i>Acceso inmediato</div>
+      <h1 class="text-4xl md:text-6xl font-black mb-6">Fija el <span class="text-amber-400">precio perfecto</span> para tu infoproducto</h1>
+      <p class="text-lg text-purple-200 mb-8">5 calculadoras especializadas, estrategia de precios y simulador de ingresos.</p>
+      <div class="flex flex-wrap gap-4">
+        <a href="#calculadora" class="btn px-8 py-4 w-auto inline-block text-center"><i class="fas fa-rocket mr-2"></i>Empezar gratis</a>
+        <a href="#copy" class="btn px-8 py-4 w-auto inline-block text-center" style="background: linear-gradient(135deg, #7C3AED, #5B21B6); color: #fff;"><i class="fas fa-shopping-cart mr-2"></i>Comprar PRO - $9.90</a>
       </div>
     </div>
     <div class="relative">
-      <div class="rounded-2xl glow float w-full aspect-video gradient-bg flex items-center justify-center">
-        <div class="text-center">
-          <i class="fas fa-calculator text-8xl text-amber-400 mb-4"></i>
-          <div class="text-3xl font-black text-white">PriceCalc Pro</div>
-          <div class="text-purple-200 mt-2">Dashboard Preview</div>
-        </div>
-      </div>
-      <div class="absolute -top-4 -right-4 glass-gold rounded-2xl p-4 float" style="animation-delay: 0.5s;">
-        <div class="text-2xl font-black text-amber-400">+347%</div>
-        <div class="text-xs text-purple-200">ROI promedio</div>
-      </div>
-      <div class="absolute -bottom-4 -left-4 glass rounded-2xl p-4 float" style="animation-delay: 1s;">
-        <div class="text-2xl font-black text-purple-300">$2.4M</div>
-        <div class="text-xs text-purple-200">Generados por usuarios</div>
+      <div class="rounded-2xl float w-full aspect-video gradient-bg flex items-center justify-center">
+        <div class="text-center"><i class="fas fa-calculator text-8xl text-amber-400 mb-4"></i><div class="text-3xl font-black">PriceCalc Pro</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Features Grid -->
-<section class="section-padding py-16 px-4">
+<!-- Features -->
+<section class="py-16 px-4">
   <div class="max-w-7xl mx-auto">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl md:text-4xl font-black mb-4">Todo lo que necesitas para <span class="text-amber-400">precificar</span></h2>
-      <p class="text-purple-300 max-w-2xl mx-auto">Herramientas profesionales que antes solo estaban disponibles para agencias de marketing</p>
-    </div>
+    <div class="text-center mb-12"><h2 class="text-3xl font-black mb-4">Todo lo que necesitas</h2></div>
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div class="glass rounded-2xl p-6 card-hover">
-        <div class="w-12 h-12 rounded-xl gradient-purple flex items-center justify-center mb-4"><i class="fas fa-calculator text-xl"></i></div>
-        <h3 class="font-bold mb-2">5 Calculadoras</h3>
-        <p class="text-sm text-purple-300">Curso, ebook, membresía, coaching y webinar</p>
-      </div>
-      <div class="glass rounded-2xl p-6 card-hover">
-        <div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4"><i class="fas fa-chess text-xl text-purple-900"></i></div>
-        <h3 class="font-bold mb-2">Estrategia 360°</h3>
-        <p class="text-sm text-purple-300">Lanzamiento, evergreen y webinar</p>
-      </div>
-      <div class="glass rounded-2xl p-6 card-hover">
-        <div class="w-12 h-12 rounded-xl gradient-purple flex items-center justify-center mb-4"><i class="fas fa-chart-line text-xl"></i></div>
-        <h3 class="font-bold mb-2">Simulador</h3>
-        <p class="text-sm text-purple-300">Proyecta ingresos con comisiones Hotmart</p>
-      </div>
-      <div class="glass rounded-2xl p-6 card-hover">
-        <div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4"><i class="fas fa-file-pdf text-xl text-purple-900"></i></div>
-        <h3 class="font-bold mb-2">Reporte PDF</h3>
-        <p class="text-sm text-purple-300">Exporta tu estrategia completa</p>
-      </div>
+      <div class="card"><div class="w-12 h-12 rounded-xl gradient-bg flex items-center justify-center mb-4"><i class="fas fa-calculator"></i></div><h3 class="font-bold mb-2">5 Calculadoras</h3><p class="text-sm text-gray-400">Curso, ebook, membresía, coaching y webinar</p></div>
+      <div class="card"><div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4"><i class="fas fa-chess text-purple-900"></i></div><h3 class="font-bold mb-2">Estrategia 360°</h3><p class="text-sm text-gray-400">Lanzamiento, evergreen y webinar</p></div>
+      <div class="card"><div class="w-12 h-12 rounded-xl gradient-bg flex items-center justify-center mb-4"><i class="fas fa-chart-line"></i></div><h3 class="font-bold mb-2">Simulador</h3><p class="text-sm text-gray-400">Proyecta ingresos con comisiones Hotmart</p></div>
+      <div class="card"><div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4"><i class="fas fa-file-pdf text-purple-900"></i></div><h3 class="font-bold mb-2">Reporte PDF</h3><p class="text-sm text-gray-400">Exporta tu estrategia completa</p></div>
     </div>
   </div>
 </section>
 
-<!-- 5 Product Types -->
-<section class="section-padding py-16 px-4 gradient-bg">
+<!-- Calculadora -->
+<section id="calculadora" class="py-16 px-4 gradient-bg">
   <div class="max-w-7xl mx-auto">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl md:text-4xl font-black mb-4">5 calculadoras para <span class="text-amber-400">cada tipo</span> de producto</h2>
-      <p class="text-purple-200">Elige tu formato y obtén el precio óptimo al instante</p>
-    </div>
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-      <div class="glass rounded-2xl p-6 text-center card-hover cursor-pointer" onclick="selectCalc('curso')">
-        <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center mb-3"><i class="fas fa-play text-2xl"></i></div>
-        <h3 class="font-bold text-sm">Curso Online</h3>
-      </div>
-      <div class="glass rounded-2xl p-6 text-center card-hover cursor-pointer" onclick="selectCalc('ebook')">
-        <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mb-3"><i class="fas fa-book text-2xl"></i></div>
-        <h3 class="font-bold text-sm">Ebook</h3>
-      </div>
-      <div class="glass rounded-2xl p-6 text-center card-hover cursor-pointer" onclick="selectCalc('membresia')">
-        <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center mb-3"><i class="fas fa-crown text-2xl"></i></div>
-        <h3 class="font-bold text-sm">Membresía</h3>
-      </div>
-      <div class="glass rounded-2xl p-6 text-center card-hover cursor-pointer" onclick="selectCalc('coaching')">
-        <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center mb-3"><i class="fas fa-users text-2xl"></i></div>
-        <h3 class="font-bold text-sm">Coaching</h3>
-      </div>
-      <div class="glass rounded-2xl p-6 text-center card-hover cursor-pointer col-span-2 md:col-span-1" onclick="selectCalc('webinar')">
-        <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-pink-500 to-pink-700 flex items-center justify-center mb-3"><i class="fas fa-microphone text-2xl"></i></div>
-        <h3 class="font-bold text-sm">Webinar</h3>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Calculadoras Section -->
-<section id="calculadoras" class="section-padding py-16 px-4">
-  <div class="max-w-7xl mx-auto">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl md:text-4xl font-black mb-4">Calculadora <span class="text-amber-400">especializada</span></h2>
-      <p class="text-purple-300">Selecciona el tipo de producto y obtén tu precio óptimo</p>
-    </div>
+    <div class="text-center mb-12"><h2 class="text-3xl font-black mb-4">Calculadora <span class="text-amber-400">especializada</span></h2></div>
     
     <div class="flex flex-wrap gap-2 mb-8 justify-center">
-      <button onclick="switchCalc('curso')" id="tab-curso" class="tab-active px-5 py-3 rounded-xl text-sm transition-all"><i class="fas fa-play mr-1"></i>Curso</button>
-      <button onclick="switchCalc('ebook')" id="tab-ebook" class="tab-inactive px-5 py-3 rounded-xl text-sm transition-all"><i class="fas fa-book mr-1"></i>Ebook</button>
-      <button onclick="switchCalc('membresia')" id="tab-membresia" class="tab-inactive px-5 py-3 rounded-xl text-sm transition-all"><i class="fas fa-crown mr-1"></i>Membresía</button>
-      <button onclick="switchCalc('coaching')" id="tab-coaching" class="tab-inactive px-5 py-3 rounded-xl text-sm transition-all"><i class="fas fa-users mr-1"></i>Coaching</button>
-      <button onclick="switchCalc('webinar')" id="tab-webinar" class="tab-inactive px-5 py-3 rounded-xl text-sm transition-all"><i class="fas fa-microphone mr-1"></i>Webinar</button>
+      <button onclick="switchCalc('curso')" id="tab-curso" class="tab tab-active px-5 py-3 rounded-xl">📊 Curso</button>
+      <button onclick="switchCalc('ebook')" id="tab-ebook" class="tab px-5 py-3 rounded-xl">📚 Ebook</button>
+      <button onclick="switchCalc('membresia')" id="tab-membresia" class="tab px-5 py-3 rounded-xl">👑 Membresía</button>
+      <button onclick="switchCalc('coaching')" id="tab-coaching" class="tab px-5 py-3 rounded-xl">👥 Coaching</button>
+      <button onclick="switchCalc('webinar')" id="tab-webinar" class="tab px-5 py-3 rounded-xl">🎤 Webinar</button>
     </div>
 
     <div class="grid lg:grid-cols-2 gap-8">
-      <div class="glass rounded-2xl p-8 relative">
-        <h3 id="calcTitle" class="text-2xl font-bold mb-6"><i class="fas fa-play text-amber-400 mr-2"></i>Curso Online</h3>
+      <div class="card">
+        <h3 id="calcTitle" class="text-2xl font-bold mb-6">📊 Curso Online</h3>
         <div id="calcForm" class="space-y-4"></div>
-        <button onclick="calculatePrice()" class="btn-primary w-full py-4 rounded-xl mt-6 text-lg">
-          <i class="fas fa-rocket mr-2"></i>Calcular precio óptimo
-        </button>
+        <button onclick="calculate()" class="btn mt-6"><i class="fas fa-rocket mr-2"></i>Calcular precio óptimo</button>
       </div>
 
-      <div class="space-y-4">
-        <div id="resultCard" class="result-card rounded-2xl p-8 hidden fade-in">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-bold">Precio recomendado</h3>
-            <span class="px-3 py-1 rounded-full bg-amber-400/20 text-amber-400 text-xs font-bold">ÓPTIMO</span>
-          </div>
-          <div class="text-5xl font-black text-amber-400 mb-2" id="resultPrice">$0</div>
-          <p class="text-purple-300 text-sm mb-6" id="resultSubtitle">Precio sugerido</p>
-          
-          <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="glass rounded-xl p-4">
-              <div class="text-xs text-purple-300 mb-1">Rango mínimo</div>
-              <div class="text-xl font-bold" id="resultMin">$0</div>
-            </div>
-            <div class="glass rounded-xl p-4">
-              <div class="text-xs text-purple-300 mb-1">Rango máximo</div>
-              <div class="text-xl font-bold text-amber-400" id="resultMax">$0</div>
-            </div>
-            <div class="glass rounded-xl p-4">
-              <div class="text-xs text-purple-300 mb-1">Margen neto</div>
-              <div class="text-xl font-bold text-green-400" id="resultMargin">0%</div>
-            </div>
-            <div class="glass rounded-xl p-4">
-              <div class="text-xs text-purple-300 mb-1">Punto de equilibrio</div>
-              <div class="text-xl font-bold" id="resultBreakeven">0 ventas</div>
-            </div>
-          </div>
-          
-          <div class="glass rounded-xl p-4 mb-4">
-            <div class="text-xs text-purple-300 mb-2">💡 Recomendación estratégica</div>
-            <p class="text-sm" id="resultAdvice">-</p>
-          </div>
+      <div id="resultCard" class="result-card hidden">
+        <div class="flex items-center justify-between mb-6"><h3 class="text-xl font-bold">Precio recomendado</h3><span class="px-3 py-1 rounded-full bg-amber-400/20 text-amber-400 text-xs font-bold">ÓPTIMO</span></div>
+        <div class="text-5xl font-black text-amber-400 mb-2" id="resultPrice">$0</div>
+        <p class="text-purple-300 text-sm mb-6" id="resultSubtitle">Precio sugerido</p>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="glass rounded-xl p-4"><div class="text-xs text-gray-400 mb-1">Rango mínimo</div><div class="text-xl font-bold" id="resultMin">$0</div></div>
+          <div class="glass rounded-xl p-4"><div class="text-xs text-gray-400 mb-1">Rango máximo</div><div class="text-xl font-bold text-amber-400" id="resultMax">$0</div></div>
+          <div class="glass rounded-xl p-4"><div class="text-xs text-gray-400 mb-1">Margen neto</div><div class="text-xl font-bold text-green-400" id="resultMargin">0%</div></div>
+          <div class="glass rounded-xl p-4"><div class="text-xs text-gray-400 mb-1">Punto de equilibrio</div><div class="text-xl font-bold" id="resultBreakeven">0 ventas</div></div>
         </div>
+        <div class="glass rounded-xl p-4"><div class="text-xs text-gray-400 mb-2">💡 Recomendación</div><p class="text-sm" id="resultAdvice">-</p></div>
+      </div>
 
-        <div id="emptyResult" class="glass rounded-2xl p-8 text-center">
-          <i class="fas fa-chart-pie text-6xl text-purple-500/30 mb-4"></i>
-          <p class="text-purple-300">Completa los datos para ver tu precio óptimo</p>
-        </div>
+      <div id="emptyResult" class="card text-center">
+        <i class="fas fa-chart-pie text-6xl text-purple-500/30 mb-4"></i>
+        <p class="text-gray-400">Completa los datos y haz clic en calcular</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Estrategia de Precios -->
-<section id="estrategia" class="section-padding py-16 px-4 gradient-bg">
+<!-- Estrategia -->
+<section id="estrategia" class="py-16 px-4">
   <div class="max-w-7xl mx-auto">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl md:text-4xl font-black mb-4">Generador de <span class="text-amber-400">estrategia</span></h2>
-      <p class="text-purple-200">3 escenarios probados para maximizar tus ventas</p>
-    </div>
-
-    <div class="glass rounded-2xl p-8 mb-8">
+    <div class="text-center mb-12"><h2 class="text-3xl font-black mb-4">Generador de <span class="text-amber-400">estrategia</span></h2></div>
+    <div class="card mb-8">
       <h3 class="text-xl font-bold mb-6">Datos de tu producto</h3>
       <div class="grid md:grid-cols-3 gap-4">
-        <div>
-          <label class="text-sm text-purple-300 mb-2 block">Tipo de producto</label>
-          <select id="stratType" class="input-field">
-            <option value="curso">Curso Online</option>
-            <option value="ebook">Ebook</option>
-            <option value="membresia">Membresía</option>
-            <option value="coaching">Coaching</option>
-            <option value="webinar">Webinar</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-sm text-purple-300 mb-2 block">Costo de producción ($)</label>
-          <input type="number" id="stratCost" value="500" min="0" class="input-field">
-        </div>
-        <div>
-          <label class="text-sm text-purple-300 mb-2 block">Valor percibido por cliente ($)</label>
-          <input type="number" id="stratValue" value="2000" min="0" class="input-field">
-        </div>
-        <div>
-          <label class="text-sm text-purple-300 mb-2 block">Audiencia actual (seguidores)</label>
-          <input type="number" id="stratAudience" value="5000" min="0" class="input-field">
-        </div>
-        <div>
-          <label class="text-sm text-purple-300 mb-2 block">Presupuesto de ads ($)</label>
-          <input type="number" id="stratAds" value="1000" min="0" class="input-field">
-        </div>
-        <div>
-          <label class="text-sm text-purple-300 mb-2 block">Tiempo disponible</label>
-          <select id="stratTime" class="input-field">
-            <option value="1">1 semana</option>
-            <option value="2">2 semanas</option>
-            <option value="4" selected>1 mes</option>
-            <option value="12">3 meses</option>
-          </select>
-        </div>
+        <div><label class="text-sm text-gray-400 mb-2 block">Valor percibido ($)</label><input type="number" id="stratValue" value="2000" class="input"></div>
+        <div><label class="text-sm text-gray-400 mb-2 block">Audiencia (seguidores)</label><input type="number" id="stratAudience" value="5000" class="input"></div>
+        <div><label class="text-sm text-gray-400 mb-2 block">Presupuesto ads ($)</label><input type="number" id="stratAds" value="1000" class="input"></div>
       </div>
-      <button onclick="generateStrategy()" class="btn-primary w-full py-4 rounded-xl mt-6 text-lg">
-        <i class="fas fa-magic mr-2"></i>Generar estrategia de precios
-      </button>
+      <button onclick="generateStrategy()" class="btn mt-6"><i class="fas fa-magic mr-2"></i>Generar estrategia</button>
     </div>
-
     <div id="strategyResults" class="grid md:grid-cols-3 gap-6 hidden">
-      <div class="scenario-card glass rounded-2xl p-6 relative">
-        <div class="absolute -top-3 left-6 px-3 py-1 rounded-full bg-blue-500 text-xs font-bold">ESCENARIO 1</div>
-        <div class="mt-4">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center"><i class="fas fa-rocket text-blue-400 text-xl"></i></div>
-            <div>
-              <h4 class="font-bold text-lg">Lanzamiento</h4>
-              <p class="text-xs text-purple-300">Alta conversión inicial</p>
-            </div>
-          </div>
-          <div class="text-3xl font-black text-blue-400 mb-4" id="stratLaunchPrice">$0</div>
-          <ul class="space-y-2 text-sm text-purple-200 mb-4" id="stratLaunchDetails"></ul>
-          <div class="glass rounded-lg p-3 text-xs">
-            <div class="text-purple-300 mb-1">Proyección 30 días</div>
-            <div class="font-bold text-lg" id="stratLaunchRevenue">$0</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="scenario-card scenario-recommended glass rounded-2xl p-6 relative">
-        <div class="absolute -top-3 left-6 px-3 py-1 rounded-full gradient-gold text-purple-900 text-xs font-bold">⭐ RECOMENDADO</div>
-        <div class="mt-4">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center"><i class="fas fa-infinity text-amber-400 text-xl"></i></div>
-            <div>
-              <h4 class="font-bold text-lg">Evergreen</h4>
-              <p class="text-xs text-purple-300">Ingresos recurrentes</p>
-            </div>
-          </div>
-          <div class="text-3xl font-black text-amber-400 mb-4" id="stratEvergreenPrice">$0</div>
-          <ul class="space-y-2 text-sm text-purple-200 mb-4" id="stratEvergreenDetails"></ul>
-          <div class="glass rounded-lg p-3 text-xs">
-            <div class="text-purple-300 mb-1">Proyección 30 días</div>
-            <div class="font-bold text-lg" id="stratEvergreenRevenue">$0</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="scenario-card glass rounded-2xl p-6 relative">
-        <div class="absolute -top-3 left-6 px-3 py-1 rounded-full bg-pink-500 text-xs font-bold">ESCENARIO 3</div>
-        <div class="mt-4">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center"><i class="fas fa-video text-pink-400 text-xl"></i></div>
-            <div>
-              <h4 class="font-bold text-lg">Webinar</h4>
-              <p class="text-xs text-purple-300">Alta autoridad</p>
-            </div>
-          </div>
-          <div class="text-3xl font-black text-pink-400 mb-4" id="stratWebinarPrice">$0</div>
-          <ul class="space-y-2 text-sm text-purple-200 mb-4" id="stratWebinarDetails"></ul>
-          <div class="glass rounded-lg p-3 text-xs">
-            <div class="text-purple-300 mb-1">Proyección 30 días</div>
-            <div class="font-bold text-lg" id="stratWebinarRevenue">$0</div>
-          </div>
-        </div>
-      </div>
+      <div class="card"><h4 class="font-bold text-lg mb-2 text-blue-400"> Lanzamiento</h4><div class="text-3xl font-black text-blue-400 mb-4" id="stratLaunchPrice">$0</div><div class="text-sm text-gray-400" id="stratLaunchDetails"></div></div>
+      <div class="card border-2 border-amber-400"><h4 class="font-bold text-lg mb-2 text-amber-400">️ Evergreen ⭐</h4><div class="text-3xl font-black text-amber-400 mb-4" id="stratEvergreenPrice">$0</div><div class="text-sm text-gray-400" id="stratEvergreenDetails"></div></div>
+      <div class="card"><h4 class="font-bold text-lg mb-2 text-pink-400">🎤 Webinar</h4><div class="text-3xl font-black text-pink-400 mb-4" id="stratWebinarPrice">$0</div><div class="text-sm text-gray-400" id="stratWebinarDetails"></div></div>
     </div>
   </div>
 </section>
 
-<!-- Simulador de Ingresos -->
-<section id="simulador" class="section-padding py-16 px-4">
+<!-- Simulador -->
+<section id="simulador" class="py-16 px-4 gradient-bg">
   <div class="max-w-7xl mx-auto">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl md:text-4xl font-black mb-4">Simulador de <span class="text-amber-400">ingresos</span></h2>
-      <p class="text-purple-300">Proyecta tus ganancias reales tras comisiones de Hotmart (9.9%)</p>
-    </div>
-
+    <div class="text-center mb-12"><h2 class="text-3xl font-black mb-4">Simulador de <span class="text-amber-400">ingresos</span></h2></div>
     <div class="grid lg:grid-cols-2 gap-8">
-      <div class="glass rounded-2xl p-8">
-        <h3 class="text-xl font-bold mb-6"><i class="fas fa-sliders-h text-amber-400 mr-2"></i>Parámetros</h3>
-        <div class="space-y-6">
-          <div>
-            <div class="flex justify-between mb-2">
-              <label class="text-sm text-purple-300">Unidades a vender</label>
-              <span class="text-amber-400 font-bold" id="unitsDisplay">100</span>
-            </div>
-            <input type="range" id="simUnits" min="1" max="1000" value="100" oninput="updateSimulator()">
-          </div>
-          <div>
-            <div class="flex justify-between mb-2">
-              <label class="text-sm text-purple-300">Precio por unidad ($)</label>
-              <span class="text-amber-400 font-bold" id="priceDisplay">$97</span>
-            </div>
-            <input type="range" id="simPrice" min="7" max="2000" value="97" oninput="updateSimulator()">
-          </div>
-          <div>
-            <div class="flex justify-between mb-2">
-              <label class="text-sm text-purple-300">Comisión Hotmart</label>
-              <span class="text-amber-400 font-bold">9.9%</span>
-            </div>
-            <div class="h-2 bg-purple-900 rounded-full overflow-hidden">
-              <div class="h-full bg-amber-400" style="width: 9.9%"></div>
-            </div>
-          </div>
-          <div>
-            <label class="text-sm text-purple-300 mb-2 block">Comisión de afiliados (%)</label>
-            <input type="number" id="simAffiliate" value="50" min="0" max="100" class="input-field" oninput="updateSimulator()">
-          </div>
+      <div class="card">
+        <h3 class="text-xl font-bold mb-6">Parámetros</h3>
+        <div class="space-y-4">
+          <div><label class="text-sm text-gray-400 mb-2 block">Unidades a vender</label><input type="range" id="simUnits" min="1" max="1000" value="100" class="w-full" oninput="updateSimulator()"><div class="text-amber-400 font-bold" id="unitsDisplay">100</div></div>
+          <div><label class="text-sm text-gray-400 mb-2 block">Precio por unidad ($)</label><input type="range" id="simPrice" min="7" max="2000" value="97" class="w-full" oninput="updateSimulator()"><div class="text-amber-400 font-bold" id="priceDisplay">$97</div></div>
+          <div><label class="text-sm text-gray-400 mb-2 block">Comisión afiliados (%)</label><input type="number" id="simAffiliate" value="50" min="0" max="100" class="input" oninput="updateSimulator()"></div>
         </div>
       </div>
-
-      <div class="space-y-4">
-        <div class="result-card rounded-2xl p-8">
-          <div class="text-sm text-purple-300 mb-2">Ingresos brutos</div>
-          <div class="text-4xl font-black mb-6" id="simGross">$0</div>
-          
-          <div class="space-y-3 mb-6">
-            <div class="flex justify-between items-center py-2 border-b border-purple-500/20">
-              <span class="text-sm text-purple-300">Comisión Hotmart (9.9%)</span>
-              <span class="font-bold text-red-400" id="simHotmartFee">-$0</span>
-            </div>
-            <div class="flex justify-between items-center py-2 border-b border-purple-500/20">
-              <span class="text-sm text-purple-300">Comisión afiliados</span>
-              <span class="font-bold text-red-400" id="simAffiliateFee">-$0</span>
-            </div>
-            <div class="flex justify-between items-center py-2 border-b border-purple-500/20">
-              <span class="text-sm text-purple-300">Impuestos estimados (10%)</span>
-              <span class="font-bold text-red-400" id="simTax">-$0</span>
-            </div>
-          </div>
-
-          <div class="glass-gold rounded-xl p-6">
-            <div class="text-sm text-amber-300 mb-2">💰 Ganancia neta estimada</div>
-            <div class="text-5xl font-black text-amber-400" id="simNet">$0</div>
-            <div class="text-xs text-purple-300 mt-2">Por unidad: <span id="simPerUnit" class="text-amber-400 font-bold">$0</span></div>
-          </div>
+      <div class="result-card">
+        <div class="text-sm text-gray-400 mb-2">Ingresos brutos</div>
+        <div class="text-4xl font-black mb-6" id="simGross">$0</div>
+        <div class="space-y-3 mb-6">
+          <div class="flex justify-between py-2 border-b border-white/10"><span class="text-gray-400">Comisión Hotmart (9.9%)</span><span class="font-bold text-red-400" id="simHotmartFee">-$0</span></div>
+          <div class="flex justify-between py-2 border-b border-white/10"><span class="text-gray-400">Comisión afiliados</span><span class="font-bold text-red-400" id="simAffiliateFee">-$0</span></div>
+          <div class="flex justify-between py-2 border-b border-white/10"><span class="text-gray-400">Impuestos (10%)</span><span class="font-bold text-red-400" id="simTax">-$0</span></div>
         </div>
+        <div class="glass-gold rounded-xl p-6"><div class="text-sm text-amber-300 mb-2">💰 Ganancia neta</div><div class="text-5xl font-black text-amber-400" id="simNet">$0</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Copy de Ventas para Landing -->
-<section id="copy-ventas" class="section-padding py-16 px-4 gradient-bg">
+<!-- Copy -->
+<section id="copy" class="py-16 px-4">
   <div class="max-w-5xl mx-auto">
-    <div class="text-center mb-12">
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-gold mb-4">
-        <i class="fas fa-copy text-amber-400"></i>
-        <span class="text-sm font-semibold text-amber-300">Copy listo para tu landing de Hotmart</span>
-      </div>
-      <h2 class="text-3xl md:text-4xl font-black mb-4">Texto de ventas <span class="text-amber-400">probado</span></h2>
-      <p class="text-purple-200">Copia y pega este contenido en tu página de ventas</p>
-    </div>
-
-    <div class="glass rounded-2xl p-8 space-y-6">
-      <div>
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="font-bold text-amber-400"><i class="fas fa-heading mr-2"></i>Título Principal</h3>
-          <button onclick="copyText('copyTitle')" class="text-xs px-3 py-1 rounded-lg glass hover:bg-white/10 cursor-pointer"><i class="fas fa-copy mr-1"></i>Copiar</button>
-        </div>
-        <div id="copyTitle" class="glass rounded-xl p-4 text-lg">
-          <strong>Descubre el Precio Exacto que Hará que Tu Infoproducto se Venda Solo (Sin Adivinar Nunca Más)</strong>
-        </div>
-      </div>
-
-      <div>
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="font-bold text-amber-400"><i class="fas fa-subheading mr-2"></i>Subtítulo</h3>
-          <button onclick="copyText('copySubtitle')" class="text-xs px-3 py-1 rounded-lg glass hover:bg-white/10 cursor-pointer"><i class="fas fa-copy mr-1"></i>Copiar</button>
-        </div>
-        <div id="copySubtitle" class="glass rounded-xl p-4">
-          La calculadora #1 usada por +10,000 creadores de Hotmart para fijar precios que convierten visitantes en compradores en segundos.
-        </div>
-      </div>
-
-      <div>
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="font-bold text-amber-400"><i class="fas fa-list mr-2"></i>Bullets de Beneficios</h3>
-          <button onclick="copyText('copyBullets')" class="text-xs px-3 py-1 rounded-lg glass hover:bg-white/10 cursor-pointer"><i class="fas fa-copy mr-1"></i>Copiar</button>
-        </div>
-        <div id="copyBullets" class="glass rounded-xl p-4 space-y-2">
-          <p>✅ <strong>5 calculadoras especializadas</strong> para curso, ebook, membresía, coaching y webinar</p>
-          <p>✅ <strong>Generador de estrategia</strong> con 3 escenarios probados (lanzamiento, evergreen, webinar)</p>
-          <p>✅ <strong>Simulador de ingresos</strong> con comisiones Hotmart reales (9.9%)</p>
-          <p>✅ <strong>Reporte PDF exportable</strong> con tu estrategia completa</p>
-          <p>✅ <strong>Resultados en segundos</strong> - sin hojas de cálculo complicadas</p>
-          <p>✅ <strong>Actualizaciones de por vida</strong> incluidas</p>
-          <p>✅ <strong>Soporte prioritario</strong> por email</p>
-        </div>
-      </div>
-
-      <div>
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="font-bold text-amber-400"><i class="fas fa-shield-alt mr-2"></i>Garantía</h3>
-          <button onclick="copyText('copyGuarantee')" class="text-xs px-3 py-1 rounded-lg glass hover:bg-white/10 cursor-pointer"><i class="fas fa-copy mr-1"></i>Copiar</button>
-        </div>
-        <div id="copyGuarantee" class="glass rounded-xl p-4">
-          <strong>️ Garantía incondicional de 7 días:</strong> Si en los próximos 7 días no estás 100% satisfecho con PriceCalc Pro, te devolvemos cada centavo. Sin preguntas, sin complicaciones. El riesgo es cero.
-        </div>
-      </div>
-
-      <div>
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="font-bold text-amber-400"><i class="fas fa-tag mr-2"></i>Oferta</h3>
-          <button onclick="copyText('copyOffer')" class="text-xs px-3 py-1 rounded-lg glass hover:bg-white/10 cursor-pointer"><i class="fas fa-copy mr-1"></i>Copiar</button>
-        </div>
-        <div id="copyOffer" class="glass rounded-xl p-4">
-          <strong>🔥 Oferta de lanzamiento:</strong> Hoy por solo <span class="text-amber-400 font-bold">$9.90 USD</span> (precio normal $19). Acceso inmediato de por vida + todas las actualizaciones futuras.
-        </div>
-      </div>
+    <div class="text-center mb-12"><h2 class="text-3xl font-black mb-4">Copy para tu landing</h2></div>
+    <div class="card space-y-6">
+      <div><h3 class="font-bold text-amber-400 mb-3">📝 Oferta</h3><div class="glass rounded-xl p-4"><strong>🔥 Oferta:</strong> Hoy por solo <span class="text-amber-400 font-bold">$9.90 USD</span> (precio normal $19). Acceso inmediato de por vida.</div></div>
+      <div><h3 class="font-bold text-amber-400 mb-3">✅ Beneficios</h3><div class="glass rounded-xl p-4 space-y-2"><p>✅ 5 calculadoras especializadas</p><p>✅ Generador de estrategia con 3 escenarios</p><p>✅ Simulador de ingresos Hotmart</p><p>✅ Reporte PDF exportable</p><p>✅ Actualizaciones de por vida</p></div></div>
     </div>
   </div>
 </section>
 
 <!-- Footer -->
-<footer class="border-t border-purple-500/20 py-12 px-4">
-  <div class="max-w-7xl mx-auto text-center">
-    <div class="flex items-center justify-center gap-3 mb-4">
-      <div class="w-10 h-10 rounded-xl gradient-purple flex items-center justify-center font-black text-xl text-amber-400">P</div>
-      <span class="font-bold text-lg">PriceCalc <span class="text-amber-400">Pro</span></span>
-    </div>
-    <p class="text-purple-300 text-sm mb-4">La herramienta definitiva para creadores de Hotmart</p>
-    <div class="flex justify-center gap-6 text-sm text-purple-400 mb-6 flex-wrap">
-      <a href="#" class="hover:text-amber-400">Términos</a>
-      <a href="#" class="hover:text-amber-400">Privacidad</a>
-      <a href="#" class="hover:text-amber-400">Soporte</a>
-      <a href="#" class="hover:text-amber-400">Afiliados</a>
-    </div>
-    <p class="text-xs text-purple-500">© 2026 PriceCalc Pro. Todos los derechos reservados.</p>
-  </div>
+<footer class="border-t border-purple-500/20 py-12 px-4 text-center">
+  <div class="max-w-7xl mx-auto"><p class="text-gray-400">© 2026 PriceCalc Pro. Todos los derechos reservados.</p></div>
 </footer>
 
-<!-- License Modal -->
-<div id="licenseModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);">
-  <div class="glass rounded-2xl p-8 max-w-md w-full relative" onclick="event.stopPropagation()">
-    <button onclick="closeLicenseModal()" class="absolute top-4 right-4 text-purple-300 hover:text-white cursor-pointer"><i class="fas fa-times text-xl"></i></button>
-    <div class="text-center mb-6">
-      <div class="w-16 h-16 mx-auto rounded-2xl gradient-gold flex items-center justify-center mb-4">
-        <i class="fas fa-key text-3xl text-purple-900"></i>
-      </div>
-      <h3 class="text-2xl font-bold mb-2">Activar licencia PRO</h3>
-      <p class="text-sm text-purple-300">Ingresa el código que recibiste por email tras tu compra en Hotmart</p>
-    </div>
-    <input type="text" id="licenseInput" placeholder="XXXX-XXXX-XXXX" class="input-field w-full px-4 py-4 rounded-xl text-center text-lg font-mono tracking-widest uppercase mb-4" onkeypress="if(event.key==='Enter')validateLicense()">
-    <div id="licenseError" class="hidden text-red-400 text-sm mb-4 text-center p-3 rounded-lg bg-red-500/10"></div>
-    <div id="licenseLoading" class="hidden text-center mb-4">
-      <div class="spinner mx-auto mb-2"></div>
-      <p class="text-sm text-purple-300">Verificando licencia...</p>
-    </div>
-    <button id="validateBtn" onclick="validateLicense()" class="btn-primary w-full py-4 rounded-xl text-lg mb-4">
-      <i class="fas fa-unlock mr-2"></i>Activar PRO
-    </button>
-    <div class="text-center text-xs text-purple-400">
-      <p>¿No tienes código? <a href="#copy-ventas" onclick="closeLicenseModal()" class="text-amber-400 hover:underline">Compra PriceCalc Pro por $9.90</a></p>
-    </div>
+<!-- Modal Licencia -->
+<div id="licenseModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.8);">
+  <div class="glass rounded-2xl p-8 max-w-md w-full relative">
+    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times text-xl"></i></button>
+    <div class="text-center mb-6"><div class="w-16 h-16 mx-auto rounded-2xl gradient-gold flex items-center justify-center mb-4"><i class="fas fa-key text-3xl text-purple-900"></i></div><h3 class="text-2xl font-bold mb-2">Activar licencia PRO</h3></div>
+    <input type="text" id="licenseInput" placeholder="XXXX-XXXX-XXXX" class="input w-full px-4 py-4 rounded-xl text-center text-lg font-mono uppercase mb-4">
+    <div id="licenseError" class="hidden text-red-400 text-sm mb-4 text-center"></div>
+    <button onclick="validateLicense()" class="btn"><i class="fas fa-unlock mr-2"></i>Activar PRO</button>
   </div>
-</div>
-
-<!-- Toast -->
-<div id="toast" class="fixed bottom-6 right-6 z-50 hidden glass rounded-xl p-4 flex items-center gap-3" style="border: 1px solid #F59E0B; max-width: 90vw;">
-  <i class="fas fa-check-circle text-amber-400 text-xl"></i>
-  <span id="toastText" class="text-sm font-semibold"></span>
 </div>
 
 <script>
-// ============================================================
-// CONFIGURACIÓN - URL del servidor de licencias
-// ============================================================
-const LICENSE_SERVER_URL = 'https://raw.githubusercontent.com/tenderoalbertalberto-rgb/pricecalc/main/licenses.json';
-
-// ============================================================
-// PWA - INSTALACIÓN
-// ============================================================
-let deferredPrompt = null;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const btn = document.getElementById('installAppBtn');
-  if (btn) btn.classList.remove('hidden');
-  document.getElementById('installBanner').classList.remove('hidden');
-});
-
-window.addEventListener('appinstalled', () => {
-  deferredPrompt = null;
-  const btn = document.getElementById('installAppBtn');
-  if (btn) btn.classList.add('hidden');
-  document.getElementById('installBanner').classList.add('hidden');
-  showToast('🎉 ¡App instalada correctamente!');
-});
-
-async function installPWA() {
-  if (!deferredPrompt) {
-    showToast('📱 Usa el menú de tu navegador → "Instalar aplicación"');
-    return;
-  }
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  if (outcome === 'accepted') {
-    showToast('✅ Instalando PriceCalc Pro...');
-  }
-  deferredPrompt = null;
-  const btn = document.getElementById('installAppBtn');
-  if (btn) btn.classList.add('hidden');
-}
-
-// Registrar Service Worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('✅ Service Worker registrado:', reg.scope))
-      .catch(err => console.warn('⚠️ SW no registrado:', err));
-  });
-}
-
-// ============================================================
-// SISTEMA DE LICENCIAS REMOTO
-// ============================================================
+const LICENSE_URL = 'https://raw.githubusercontent.com/tenderoalbertalberto-rgb/pricecalc/main/licenses.json';
 let isPremium = localStorage.getItem('pricecalc_premium') === 'true';
+let currentCalc = 'curso';
+
+const configs = {
+  curso: {
+    title: '📊 Curso Online',
+    fields: [
+      {id: 'fixed', label: 'Costos fijos ($)', value: 2000},
+      {id: 'var', label: 'Costo variable por alumno ($)', value: 10},
+      {id: 'sales', label: 'Ventas objetivo mensuales', value: 50},
+      {id: 'margin', label: 'Margen deseado (%)', value: 70},
+      {id: 'value', label: 'Valor al alumno ($/año)', value: 5000},
+      {id: 'capture', label: '% del valor que capturas', value: 10}
+    ]
+  },
+  ebook: {
+    title: '📚 Ebook',
+    fields: [
+      {id: 'fixed', label: 'Costos de creación ($)', value: 500},
+      {id: 'var', label: 'Costo por descarga ($)', value: 0},
+      {id: 'sales', label: 'Ventas objetivo mensuales', value: 200},
+      {id: 'margin', label: 'Margen deseado (%)', value: 90},
+      {id: 'pages', label: 'Número de páginas', value: 150},
+      {id: 'niche', label: 'Competencia (1-10)', value: 6}
+    ]
+  },
+  membresia: {
+    title: '👑 Membresía',
+    fields: [
+      {id: 'fixed', label: 'Costos fijos mensuales ($)', value: 1500},
+      {id: 'var', label: 'Costo por miembro/mes ($)', value: 5},
+      {id: 'sales', label: 'Miembros objetivo', value: 100},
+      {id: 'margin', label: 'Margen deseado (%)', value: 60},
+      {id: 'churn', label: 'Churn rate mensual (%)', value: 8},
+      {id: 'ltv', label: 'LTV por miembro ($)', value: 500}
+    ]
+  },
+  coaching: {
+    title: '👥 Coaching 1:1',
+    fields: [
+      {id: 'fixed', label: 'Costos fijos mensuales ($)', value: 800},
+      {id: 'var', label: 'Costo por sesión ($)', value: 20},
+      {id: 'sales', label: 'Clientes objetivo', value: 10},
+      {id: 'margin', label: 'Margen deseado (%)', value: 75},
+      {id: 'hours', label: 'Horas disponibles/semana', value: 20},
+      {id: 'exp', label: 'Años de experiencia', value: 5}
+    ]
+  },
+  webinar: {
+    title: '🎤 Webinar',
+    fields: [
+      {id: 'fixed', label: 'Costos de producción ($)', value: 300},
+      {id: 'var', label: 'Costo por asistente ($)', value: 2},
+      {id: 'sales', label: 'Asistentes objetivo', value: 500},
+      {id: 'margin', label: 'Margen deseado (%)', value: 80},
+      {id: 'conv', label: 'Tasa de conversión (%)', value: 15},
+      {id: 'upsell', label: 'Valor del upsell ($)', value: 500}
+    ]
+  }
+};
+
+function switchCalc(type) {
+  currentCalc = type;
+  document.querySelectorAll('[id^="tab-"]').forEach(t => {
+    t.classList.remove('tab-active');
+    t.classList.add('tab');
+  });
+  document.getElementById('tab-' + type).classList.remove('tab');
+  document.getElementById('tab-' + type).classList.add('tab-active');
+  
+  const cfg = configs[type];
+  document.getElementById('calcTitle').textContent = cfg.title;
+  document.getElementById('resultCard').classList.add('hidden');
+  document.getElementById('emptyResult').classList.remove('hidden');
+  
+  const form = document.getElementById('calcForm');
+  form.innerHTML = cfg.fields.map(f => `
+    <div><label class="text-sm text-gray-400 mb-2 block">${f.label}</label><input type="number" id="f-${f.id}" value="${f.value}" class="input"></div>
+  `).join('');
+}
+
+function calculate() {
+  const cfg = configs[currentCalc];
+  const v = {};
+  cfg.fields.forEach(f => v[f.id] = parseFloat(document.getElementById('f-' + f.id).value) || 0);
+  
+  let price = 0, min = 0, max = 0, margin = 0, breakeven = 0, advice = '';
+  
+  if (currentCalc === 'curso') {
+    const costPerStudent = (v.fixed / v.sales) + v.var;
+    price = costPerStudent / (1 - v.margin/100);
+    const valuePrice = v.value * (v.capture/100);
+    price = Math.min(price, valuePrice);
+    min = price * 0.8;
+    max = price * 1.3;
+    margin = v.margin;
+    breakeven = Math.ceil(v.fixed / Math.max(1, price - v.var));
+    advice = `Con valor percibido de $${v.value}, puedes posicionarte entre $${min.toFixed(0)} y $${max.toFixed(0)}. Óptimo: $${price.toFixed(0)}.`;
+  }
+  else if (currentCalc === 'ebook') {
+    const basePrice = (v.pages * 0.15) * (1 + v.niche/20);
+    price = basePrice * (1 + v.margin/100);
+    min = price * 0.7;
+    max = price * 1.4;
+    margin = v.margin;
+    breakeven = Math.ceil(v.fixed / Math.max(1, price));
+    advice = `Ebooks de ${v.pages} páginas con competencia ${v.niche}/10: entre $${min.toFixed(0)} y $${max.toFixed(0)}. Sugerido: $${price.toFixed(0)}.`;
+  }
+  else if (currentCalc === 'membresia') {
+    const monthlyCost = (v.fixed / v.sales) + v.var;
+    const ltvFactor = 1 / (v.churn/100);
+    price = (v.ltv / ltvFactor) * (1 + v.margin/100);
+    price = Math.max(price, monthlyCost / (1 - v.margin/100));
+    min = price * 0.85;
+    max = price * 1.25;
+    margin = v.margin;
+    breakeven = Math.ceil(v.fixed / Math.max(1, price - v.var));
+    advice = `Con churn ${v.churn}%, LTV es $${v.ltv}. Precio mensual óptimo: $${price.toFixed(0)}.`;
+  }
+  else if (currentCalc === 'coaching') {
+    const hourlyRate = (v.exp * 50) + 100;
+    const costPerClient = (v.fixed / v.sales) + v.var;
+    price = Math.max(hourlyRate * 4, costPerClient / (1 - v.margin/100));
+    min = price * 0.8;
+    max = price * 1.5;
+    margin = v.margin;
+    breakeven = Math.ceil(v.fixed / Math.max(1, price - v.var));
+    advice = `Con ${v.exp} años experiencia, tarifa base $${hourlyRate}. Paquete mensual: $${price.toFixed(0)}.`;
+  }
+  else if (currentCalc === 'webinar') {
+    const costPerAttendee = (v.fixed / v.sales) + v.var;
+    const expectedSales = v.sales * (v.conv/100);
+    const revenuePerAttendee = v.upsell * (v.conv/100);
+    price = Math.max(revenuePerAttendee * 0.3, costPerAttendee / (1 - v.margin/100));
+    min = price * 0.5;
+    max = price * 2;
+    margin = v.margin;
+    breakeven = Math.ceil(v.fixed / Math.max(1, price * v.conv/100 - v.var));
+    advice = `Con ${v.sales} asistentes y ${v.conv}% conversión, genera ~$${(expectedSales * v.upsell).toFixed(0)} en upsells.`;
+  }
+  
+  document.getElementById('resultPrice').textContent = '$' + price.toFixed(0);
+  document.getElementById('resultMin').textContent = '$' + min.toFixed(0);
+  document.getElementById('resultMax').textContent = '$' + max.toFixed(0);
+  document.getElementById('resultMargin').textContent = margin.toFixed(0) + '%';
+  document.getElementById('resultBreakeven').textContent = breakeven + ' ventas';
+  document.getElementById('resultAdvice').textContent = advice;
+  document.getElementById('resultSubtitle').textContent = 'Precio sugerido para ' + cfg.title;
+  
+  document.getElementById('resultCard').classList.remove('hidden');
+  document.getElementById('emptyResult').classList.add('hidden');
+}
 
 function updateLicenseUI() {
   const status = document.getElementById('licenseStatus');
   const text = document.getElementById('licenseText');
-  
   if (isPremium) {
     status.classList.remove('hidden');
     status.classList.add('flex');
@@ -669,378 +368,83 @@ function updateLicenseUI() {
   }
 }
 
-function openLicenseModal() {
-  const modal = document.getElementById('licenseModal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-  modal.onclick = function(e) {
-    if (e.target === modal) closeLicenseModal();
-  };
+function openModal() {
+  document.getElementById('licenseModal').classList.remove('hidden');
+  document.getElementById('licenseModal').classList.add('flex');
   document.getElementById('licenseError').classList.add('hidden');
-  setTimeout(() => document.getElementById('licenseInput').focus(), 100);
 }
 
-function closeLicenseModal() {
-  const modal = document.getElementById('licenseModal');
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
-  document.getElementById('licenseError').classList.add('hidden');
-  document.getElementById('licenseLoading').classList.add('hidden');
-  document.getElementById('validateBtn').disabled = false;
-  document.getElementById('validateBtn').innerHTML = '<i class="fas fa-unlock mr-2"></i>Activar PRO';
+function closeModal() {
+  document.getElementById('licenseModal').classList.add('hidden');
+  document.getElementById('licenseModal').classList.remove('flex');
 }
 
 async function validateLicense() {
   const input = document.getElementById('licenseInput').value.trim().toUpperCase();
   const errorEl = document.getElementById('licenseError');
-  const loadingEl = document.getElementById('licenseLoading');
-  const btn = document.getElementById('validateBtn');
-  
-  errorEl.classList.add('hidden');
   
   if (!input) {
-    errorEl.innerHTML = '<i class="fas fa-exclamation-circle mr-1"></i> Por favor ingresa un código de licencia';
+    errorEl.textContent = 'Ingresa un código';
     errorEl.classList.remove('hidden');
     return;
   }
-  
-  if (input.length < 8) {
-    errorEl.innerHTML = '<i class="fas fa-exclamation-circle mr-1"></i> El código parece muy corto. Revisa tu email de Hotmart.';
-    errorEl.classList.remove('hidden');
-    return;
-  }
-  
-  loadingEl.classList.remove('hidden');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Verificando...';
   
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-    
-    const response = await fetch(LICENSE_SERVER_URL + '?t=' + Date.now(), {
-      signal: controller.signal,
-      cache: 'no-store'
-    });
-    clearTimeout(timeoutId);
-    
-    if (!response.ok) {
-      throw new Error('HTTP ' + response.status);
-    }
-    
+    const response = await fetch(LICENSE_URL + '?t=' + Date.now());
     const data = await response.json();
     
-    if (!data.valid_licenses || !Array.isArray(data.valid_licenses)) {
-      throw new Error('Formato de servidor inválido');
-    }
-    
-    const isValid = data.valid_licenses.includes(input);
-    
-    if (isValid) {
+    if (data.valid_licenses && data.valid_licenses.includes(input)) {
       isPremium = true;
       localStorage.setItem('pricecalc_premium', 'true');
       localStorage.setItem('pricecalc_license', input);
-      localStorage.setItem('pricecalc_activated', new Date().toISOString());
-      
       updateLicenseUI();
-      closeLicenseModal();
-      showToast(' ¡Licencia PRO activada! Todas las funciones desbloqueadas');
+      closeModal();
+      alert('¡Licencia PRO activada!');
     } else {
-      errorEl.innerHTML = '<i class="fas fa-times-circle mr-1"></i> Código inválido. Verifica tu email de Hotmart o contacta soporte.';
+      errorEl.textContent = 'Código inválido';
       errorEl.classList.remove('hidden');
     }
-    
   } catch (err) {
-    console.error('Error validando licencia:', err);
-    
-    let errorMsg = '<i class="fas fa-wifi mr-1"></i> ';
-    
-    if (err.name === 'AbortError') {
-      errorMsg += 'Tiempo de espera agotado. Verifica tu conexión e intenta de nuevo.';
-    } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-      errorMsg += 'No se pudo conectar al servidor de licencias. Verifica tu conexión a internet.';
-    } else if (err.message.includes('HTTP')) {
-      errorMsg += 'Error del servidor. Intenta más tarde o contacta soporte.';
-    } else {
-      errorMsg += 'Error al validar. Intenta de nuevo en unos segundos.';
-    }
-    
-    errorEl.innerHTML = errorMsg;
+    errorEl.textContent = 'Error de conexión';
     errorEl.classList.remove('hidden');
-  } finally {
-    loadingEl.classList.add('hidden');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-unlock mr-2"></i>Activar PRO';
   }
 }
 
-// ============================================================
-// CALCULADORAS
-// ============================================================
-const calcConfigs = {
-  curso: {
-    title: 'Curso Online', icon: 'fa-play',
-    fields: [
-      { id: 'fixedCost', label: 'Costos fijos (producción, plataforma)', value: 2000, icon: 'fa-server', min: 0 },
-      { id: 'varCost', label: 'Costo variable por alumno ($)', value: 10, icon: 'fa-user', min: 0 },
-      { id: 'targetSales', label: 'Ventas objetivo mensuales', value: 50, icon: 'fa-bullseye', min: 1 },
-      { id: 'margin', label: 'Margen deseado (%)', value: 70, icon: 'fa-percentage', min: 0, max: 99 },
-      { id: 'value', label: 'Valor que aporta al alumno ($/año)', value: 5000, icon: 'fa-gift', min: 0 },
-      { id: 'capture', label: '% del valor que capturas', value: 10, icon: 'fa-hand-holding-usd', min: 0, max: 100 }
-    ]
-  },
-  ebook: {
-    title: 'Ebook', icon: 'fa-book',
-    fields: [
-      { id: 'fixedCost', label: 'Costos de creación ($)', value: 500, icon: 'fa-pen', min: 0 },
-      { id: 'varCost', label: 'Costo por descarga ($)', value: 0, icon: 'fa-download', min: 0 },
-      { id: 'targetSales', label: 'Ventas objetivo mensuales', value: 200, icon: 'fa-bullseye', min: 1 },
-      { id: 'margin', label: 'Margen deseado (%)', value: 90, icon: 'fa-percentage', min: 0, max: 99 },
-      { id: 'pages', label: 'Número de páginas', value: 150, icon: 'fa-file-alt', min: 1 },
-      { id: 'niche', label: 'Competencia (1=baja, 10=alta)', value: 6, icon: 'fa-chart-bar', min: 1, max: 10 }
-    ]
-  },
-  membresia: {
-    title: 'Membresía', icon: 'fa-crown',
-    fields: [
-      { id: 'fixedCost', label: 'Costos fijos mensuales ($)', value: 1500, icon: 'fa-server', min: 0 },
-      { id: 'varCost', label: 'Costo por miembro/mes ($)', value: 5, icon: 'fa-user', min: 0 },
-      { id: 'targetSales', label: 'Miembros objetivo', value: 100, icon: 'fa-users', min: 1 },
-      { id: 'margin', label: 'Margen deseado (%)', value: 60, icon: 'fa-percentage', min: 0, max: 99 },
-      { id: 'churn', label: 'Churn rate mensual (%)', value: 8, icon: 'fa-sign-out-alt', min: 1, max: 100 },
-      { id: 'ltv', label: 'LTV esperado por miembro ($)', value: 500, icon: 'fa-chart-line', min: 0 }
-    ]
-  },
-  coaching: {
-    title: 'Coaching 1:1', icon: 'fa-users',
-    fields: [
-      { id: 'fixedCost', label: 'Costos fijos mensuales ($)', value: 800, icon: 'fa-briefcase', min: 0 },
-      { id: 'varCost', label: 'Costo por sesión ($)', value: 20, icon: 'fa-clock', min: 0 },
-      { id: 'targetSales', label: 'Clientes objetivo', value: 10, icon: 'fa-user-tie', min: 1 },
-      { id: 'margin', label: 'Margen deseado (%)', value: 75, icon: 'fa-percentage', min: 0, max: 99 },
-      { id: 'hours', label: 'Horas disponibles/semana', value: 20, icon: 'fa-calendar', min: 1, max: 168 },
-      { id: 'experience', label: 'Años de experiencia', value: 5, icon: 'fa-award', min: 0 }
-    ]
-  },
-  webinar: {
-    title: 'Webinar', icon: 'fa-microphone',
-    fields: [
-      { id: 'fixedCost', label: 'Costos de producción ($)', value: 300, icon: 'fa-video', min: 0 },
-      { id: 'varCost', label: 'Costo por asistente ($)', value: 2, icon: 'fa-user', min: 0 },
-      { id: 'targetSales', label: 'Asistentes objetivo', value: 500, icon: 'fa-users', min: 1 },
-      { id: 'margin', label: 'Margen deseado (%)', value: 80, icon: 'fa-percentage', min: 0, max: 99 },
-      { id: 'conversion', label: 'Tasa de conversión esperada (%)', value: 15, icon: 'fa-chart-pie', min: 1, max: 100 },
-      { id: 'upsell', label: 'Valor del upsell posterior ($)', value: 500, icon: 'fa-arrow-up', min: 0 }
-    ]
-  }
-};
-
-let currentCalc = 'curso';
-
-function switchCalc(type) {
-  currentCalc = type;
-  Object.keys(calcConfigs).forEach(key => {
-    const tab = document.getElementById(`tab-${key}`);
-    if (!tab) return;
-    if (key === type) {
-      tab.classList.remove('tab-inactive');
-      tab.classList.add('tab-active');
-    } else {
-      tab.classList.remove('tab-active');
-      tab.classList.add('tab-inactive');
-    }
-  });
-  
-  const config = calcConfigs[type];
-  document.getElementById('calcTitle').innerHTML = `<i class="fas ${config.icon} text-amber-400 mr-2"></i>${config.title}`;
-  
-  const form = document.getElementById('calcForm');
-  form.innerHTML = config.fields.map(f => `
-    <div>
-      <label class="text-sm text-purple-300 mb-2 flex items-center gap-2">
-        <i class="fas ${f.icon} text-amber-400"></i>${f.label}
-      </label>
-      <input type="number" id="field-${f.id}" value="${f.value}" min="${f.min || 0}" ${f.max !== undefined ? `max="${f.max}"` : ''} class="input-field">
-    </div>
-  `).join('');
-  
-  document.getElementById('resultCard').classList.add('hidden');
-  document.getElementById('emptyResult').classList.remove('hidden');
-}
-
-function selectCalc(type) {
-  switchCalc(type);
-  document.getElementById('calculadoras').scrollIntoView({ behavior: 'smooth' });
-}
-
-function calculatePrice() {
-  const config = calcConfigs[currentCalc];
-  const values = {};
-  
-  config.fields.forEach(f => {
-    const el = document.getElementById(`field-${f.id}`);
-    if (el) {
-      values[f.id] = parseFloat(el.value) || 0;
-    }
-  });
-  
-  let price = 0, minPrice = 0, maxPrice = 0, margin = 0, breakeven = 0, advice = '';
-  
-  switch(currentCalc) {
-    case 'curso': {
-      const costPerStudent = (values.fixedCost / values.targetSales) + values.varCost;
-      price = costPerStudent / (1 - values.margin/100);
-      const valuePrice = values.value * (values.capture/100);
-      price = Math.min(price, valuePrice);
-      minPrice = price * 0.8;
-      maxPrice = price * 1.3;
-      margin = values.margin;
-      breakeven = Math.ceil(values.fixedCost / Math.max(1, price - values.varCost));
-      advice = `Con un valor percibido de $${values.value}, puedes posicionarte entre $${minPrice.toFixed(0)} y $${maxPrice.toFixed(0)}. El punto óptimo es $${price.toFixed(0)} para maximizar conversiones y margen.`;
-      break;
-    }
-    case 'ebook': {
-      const basePrice = (values.pages * 0.15) * (1 + values.niche/20);
-      const costImpact = values.varCost * 2;
-      price = (basePrice + costImpact) * (1 + values.margin/100);
-      minPrice = price * 0.7;
-      maxPrice = price * 1.4;
-      margin = values.margin;
-      breakeven = Math.ceil(values.fixedCost / Math.max(1, price - values.varCost));
-      advice = `Ebooks de ${values.pages} páginas en nichos de competencia ${values.niche}/10 suelen venderse entre $${minPrice.toFixed(0)} y $${maxPrice.toFixed(0)}. Precio sugerido: $${price.toFixed(0)}.`;
-      break;
-}
-    }
-    case 'membresia': {
-      const monthlyCost = (values.fixedCost / values.targetSales) + values.varCost;
-      const ltvFactor = 1 / (values.churn/100);
-      price = (values.ltv / ltvFactor) * (1 + values.margin/100);
-      price = Math.max(price, monthlyCost / (1 - values.margin/100));
-      minPrice = price * 0.85;
-      maxPrice = price * 1.25;
-      margin = values.margin;
-      breakeven = Math.ceil(values.fixedCost / Math.max(1, price - values.varCost));
-      advice = `Con churn del ${values.churn}%, el LTV es $${values.ltv}. Precio mensual óptimo: $${price.toFixed(0)}. Enfócate en retención para maximizar ganancias.`;
-      break;
-    }
-    case 'coaching': {
-      const hourlyRate = (values.experience * 50) + 100;
-      const costPerClient = (values.fixedCost / values.targetSales) + values.varCost;
-      const costBasedPrice = costPerClient / (1 - values.margin/100);
-      const experienceBasedPrice = hourlyRate * 4;
-      price = (costBasedPrice * 0.4) + (experienceBasedPrice * 0.6);
-      minPrice = price * 0.8;
-      maxPrice = price * 1.5;
-      margin = values.margin;
-      breakeven = Math.ceil(values.fixedCost / Math.max(1, price - values.varCost));
-      advice = `Con ${values.experience} años de experiencia, tu tarifa horaria base es $${hourlyRate}. Paquete mensual sugerido: $${price.toFixed(0)}.`;
-      break;
-}
-    }
-    case 'webinar': {
-      const costPerAttendee = (values.fixedCost / values.targetSales) + values.varCost;
-      const expectedSales = values.targetSales * (values.conversion/100);
-      const revenuePerAttendee = values.upsell * (values.conversion/100);
-      price = Math.max(revenuePerAttendee * 0.3, costPerAttendee / (1 - values.margin/100));
-      minPrice = price * 0.5;
-      maxPrice = price * 2;
-      margin = values.margin;
-      breakeven = Math.ceil(values.fixedCost / Math.max(1, price * values.conversion/100 - values.varCost));
-      advice = `Con ${values.targetSales} asistentes y ${values.conversion}% de conversión, genera ~$${(expectedSales * values.upsell).toFixed(0)} en upsells. Precio del webinar: $${price.toFixed(0)} (o gratuito para maximizar upsells).`;
-      break;
-    }
-  }
-  
-  document.getElementById('resultPrice').textContent = `$${price.toFixed(0)}`;
-  document.getElementById('resultMin').textContent = `$${minPrice.toFixed(0)}`;
-  document.getElementById('resultMax').textContent = `$${maxPrice.toFixed(0)}`;
-  document.getElementById('resultMargin').textContent = `${margin.toFixed(0)}%`;
-  document.getElementById('resultBreakeven').textContent = `${breakeven} ventas`;
-  document.getElementById('resultAdvice').textContent = advice;
-  document.getElementById('resultSubtitle').textContent = `Precio sugerido para ${config.title}`;
-  
-  document.getElementById('resultCard').classList.remove('hidden');
-  document.getElementById('emptyResult').classList.add('hidden');
-  
-  showToast('✅ Cálculo completado con éxito');
-}
-
-// ============================================================
-// GENERADOR DE ESTRATEGIA
-// ============================================================
 function generateStrategy() {
-  const value = parseFloat(document.getElementById('stratValue').value) || 0;
-  const audience = parseFloat(document.getElementById('stratAudience').value) || 0;
-  const ads = parseFloat(document.getElementById('stratAds').value) || 0;
-  const time = parseFloat(document.getElementById('stratTime').value) || 1;
-  
-  if (value <= 0 || audience <= 0) {
-    showToast('⚠️ El valor y la audiencia deben ser mayores a 0');
-    return;
-  }
+  const value = parseFloat(document.getElementById('stratValue').value) || 2000;
+  const audience = parseFloat(document.getElementById('stratAudience').value) || 5000;
+  const ads = parseFloat(document.getElementById('stratAds').value) || 1000;
   
   const launchPrice = Math.max(27, value * 0.15);
-  const launchConv = 0.03;
-  const launchSales = Math.floor(audience * launchConv * (1 + ads/1000));
+  const launchSales = Math.floor(audience * 0.03 * (1 + ads/1000));
   const launchRevenue = launchSales * launchPrice * 0.901;
   
   const evergreenPrice = Math.max(47, value * 0.25);
-  const evergreenConv = 0.015;
-  const evergreenSales = Math.floor(audience * evergreenConv * 0.5);
-  const evergreenRevenue = evergreenSales * evergreenPrice * 0.901 * (30/time);
+  const evergreenSales = Math.floor(audience * 0.015 * 0.5);
+  const evergreenRevenue = evergreenSales * evergreenPrice * 0.901 * 30;
   
   const webinarPrice = Math.max(97, value * 0.4);
-  const webinarConv = 0.008;
-  const webinarSales = Math.floor(audience * webinarConv * 0.7);
+  const webinarSales = Math.floor(audience * 0.008 * 0.7);
   const webinarRevenue = webinarSales * webinarPrice * 0.901;
   
-  document.getElementById('stratLaunchPrice').textContent = `$${launchPrice.toFixed(0)}`;
-  document.getElementById('stratEvergreenPrice').textContent = `$${evergreenPrice.toFixed(0)}`;
-  document.getElementById('stratWebinarPrice').textContent = `$${webinarPrice.toFixed(0)}`;
+  document.getElementById('stratLaunchPrice').textContent = '$' + launchPrice.toFixed(0);
+  document.getElementById('stratEvergreenPrice').textContent = '$' + evergreenPrice.toFixed(0);
+  document.getElementById('stratWebinarPrice').textContent = '$' + webinarPrice.toFixed(0);
   
-  document.getElementById('stratLaunchDetails').innerHTML = `
-    <li><i class="fas fa-check text-blue-400 mr-1"></i>Conversión: ${(launchConv*100).toFixed(1)}%</li>
-    <li><i class="fas fa-check text-blue-400 mr-1"></i>Ventas estimadas: ${launchSales}</li>
-    <li><i class="fas fa-check text-blue-400 mr-1"></i>Ideal para: lista caliente</li>
-    <li><i class="fas fa-check text-blue-400 mr-1"></i>Duración: 7-14 días</li>
-  `;
-  
-  document.getElementById('stratEvergreenDetails').innerHTML = `
-    <li><i class="fas fa-check text-amber-400 mr-1"></i>Conversión: ${(evergreenConv*100).toFixed(1)}%</li>
-    <li><i class="fas fa-check text-amber-400 mr-1"></i>Ventas/mes: ${evergreenSales}</li>
-    <li><i class="fas fa-check text-amber-400 mr-1"></i>Ideal para: tráfico frío</li>
-    <li><i class="fas fa-check text-amber-400 mr-1"></i>Automatizado 24/7</li>
-  `;
-  
-  document.getElementById('stratWebinarDetails').innerHTML = `
-    <li><i class="fas fa-check text-pink-400 mr-1"></i>Conversión: ${(webinarConv*100).toFixed(1)}%</li>
-    <li><i class="fas fa-check text-pink-400 mr-1"></i>Ventas estimadas: ${webinarSales}</li>
-    <li><i class="fas fa-check text-pink-400 mr-1"></i>Ideal para: autoridad</li>
-    <li><i class="fas fa-check text-pink-400 mr-1"></i>Requiere: 1 sesión/mes</li>
-  `;
-  
-  document.getElementById('stratLaunchRevenue').textContent = `$${launchRevenue.toFixed(0)}`;
-  document.getElementById('stratEvergreenRevenue').textContent = `$${evergreenRevenue.toFixed(0)}`;
-  document.getElementById('stratWebinarRevenue').textContent = `$${webinarRevenue.toFixed(0)}`;
+  document.getElementById('stratLaunchDetails').innerHTML = `Ventas: ${launchSales}<br>Ingresos: $${launchRevenue.toFixed(0)}`;
+  document.getElementById('stratEvergreenDetails').innerHTML = `Ventas/mes: ${evergreenSales}<br>Ingresos: $${evergreenRevenue.toFixed(0)}`;
+  document.getElementById('stratWebinarDetails').innerHTML = `Ventas: ${webinarSales}<br>Ingresos: $${webinarRevenue.toFixed(0)}`;
   
   document.getElementById('strategyResults').classList.remove('hidden');
-  setTimeout(() => {
-    document.getElementById('strategyResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
-  
-  showToast('🎯 Estrategia generada con 3 escenarios');
 }
 
-// ============================================================
-// SIMULADOR DE INGRESOS
-// ============================================================
 function updateSimulator() {
   const units = parseInt(document.getElementById('simUnits').value) || 0;
   const price = parseInt(document.getElementById('simPrice').value) || 0;
   const affiliateRate = Math.min(100, Math.max(0, parseFloat(document.getElementById('simAffiliate').value) || 0));
   
   document.getElementById('unitsDisplay').textContent = units;
-  document.getElementById('priceDisplay').textContent = `$${price}`;
+  document.getElementById('priceDisplay').textContent = '$' + price;
   
   const gross = units * price;
   const hotmartFee = gross * 0.099;
@@ -1048,75 +452,19 @@ function updateSimulator() {
   const afterFees = gross - hotmartFee - affiliateFee;
   const tax = afterFees * 0.10;
   const net = Math.max(0, afterFees - tax);
-  const perUnit = units > 0 ? net / units : 0;
   
-  document.getElementById('simGross').textContent = `$${gross.toLocaleString('es-ES')}`;
-  document.getElementById('simHotmartFee').textContent = `-$${hotmartFee.toFixed(0)}`;
-  document.getElementById('simAffiliateFee').textContent = `-$${affiliateFee.toFixed(0)}`;
-  document.getElementById('simTax').textContent = `-$${tax.toFixed(0)}`;
-  document.getElementById('simNet').textContent = `$${net.toFixed(0)}`;
-  document.getElementById('simPerUnit').textContent = `$${perUnit.toFixed(2)}`;
+  document.getElementById('simGross').textContent = '$' + gross.toLocaleString();
+  document.getElementById('simHotmartFee').textContent = '-$' + hotmartFee.toFixed(0);
+  document.getElementById('simAffiliateFee').textContent = '-$' + affiliateFee.toFixed(0);
+  document.getElementById('simTax').textContent = '-$' + tax.toFixed(0);
+  document.getElementById('simNet').textContent = '$' + net.toFixed(0);
 }
 
-// ============================================================
-// UTILIDADES
-// ============================================================
-let toastTimeout;
-function showToast(msg) {
-  const toast = document.getElementById('toast');
-  document.getElementById('toastText').textContent = msg;
-  toast.classList.remove('hidden');
-  toast.classList.add('toast-enter');
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => {
-    toast.classList.add('hidden');
-    toast.classList.remove('toast-enter');
-  }, 3500);
-}
-
-function copyText(id) {
-  const text = document.getElementById(id).innerText;
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => {
-      showToast('📋 Copiado al portapapeles');
-    }).catch(() => fallbackCopy(text));
-  } else {
-    fallbackCopy(text);
-  }
-}
-
-function fallbackCopy(text) {
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  textarea.style.position = 'fixed';
-  textarea.style.opacity = '0';
-  document.body.appendChild(textarea);
-  textarea.select();
-  try {
-    document.execCommand('copy');
-    showToast('📋 Copiado al portapapeles');
-  } catch (err) {
-    showToast('❌ No se pudo copiar');
-  }
-  document.body.removeChild(textarea);
-}
-
-// ============================================================
-// INICIALIZACIÓN
-// ============================================================
+// Init
 document.addEventListener('DOMContentLoaded', () => {
   updateLicenseUI();
   switchCalc('curso');
   updateSimulator();
-  
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      const modal = document.getElementById('licenseModal');
-      if (!modal.classList.contains('hidden')) closeLicenseModal();
-    }
-  });
-  
-  console.log('%c✅ PriceCalc Pro v2.0 cargado', 'color: #F59E0B; font-size: 14px; font-weight: bold;');
 });
 </script>
 </body>

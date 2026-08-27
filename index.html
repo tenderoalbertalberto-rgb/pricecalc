@@ -901,13 +901,15 @@ function calculatePrice() {
     }
     case 'ebook': {
       const basePrice = (values.pages * 0.15) * (1 + values.niche/20);
-      price = basePrice * (1 + values.margin/100);
+      const costImpact = values.varCost * 2;
+      price = (basePrice + costImpact) * (1 + values.margin/100);
       minPrice = price * 0.7;
       maxPrice = price * 1.4;
       margin = values.margin;
-      breakeven = Math.ceil(values.fixedCost / Math.max(1, price));
+      breakeven = Math.ceil(values.fixedCost / Math.max(1, price - values.varCost));
       advice = `Ebooks de ${values.pages} páginas en nichos de competencia ${values.niche}/10 suelen venderse entre $${minPrice.toFixed(0)} y $${maxPrice.toFixed(0)}. Precio sugerido: $${price.toFixed(0)}.`;
       break;
+}
     }
     case 'membresia': {
       const monthlyCost = (values.fixedCost / values.targetSales) + values.varCost;
@@ -924,13 +926,16 @@ function calculatePrice() {
     case 'coaching': {
       const hourlyRate = (values.experience * 50) + 100;
       const costPerClient = (values.fixedCost / values.targetSales) + values.varCost;
-      price = Math.max(hourlyRate * 4, costPerClient / (1 - values.margin/100));
+      const costBasedPrice = costPerClient / (1 - values.margin/100);
+      const experienceBasedPrice = hourlyRate * 4;
+      price = (costBasedPrice * 0.4) + (experienceBasedPrice * 0.6);
       minPrice = price * 0.8;
       maxPrice = price * 1.5;
       margin = values.margin;
       breakeven = Math.ceil(values.fixedCost / Math.max(1, price - values.varCost));
       advice = `Con ${values.experience} años de experiencia, tu tarifa horaria base es $${hourlyRate}. Paquete mensual sugerido: $${price.toFixed(0)}.`;
       break;
+}
     }
     case 'webinar': {
       const costPerAttendee = (values.fixedCost / values.targetSales) + values.varCost;

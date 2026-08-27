@@ -12,6 +12,7 @@
 <style>
   * { font-family: system-ui, sans-serif; box-sizing: border-box; }
   body { background: #0f0720; color: #fff; margin: 0; overflow-x: hidden; }
+  body.modal-open { overflow: hidden !important; position: fixed !important; width: 100%; height: 100%; }
   .gradient-bg { background: linear-gradient(135deg, #1e1b4b 0%, #5B21B6 50%, #7C3AED 100%); }
   .gradient-gold { background: linear-gradient(135deg, #F59E0B 0%, #FCD34D 100%); }
   .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
@@ -19,8 +20,9 @@
   .tab-active { background: linear-gradient(135deg, #F59E0B, #FCD34D); color: #1e1b4b; font-weight: 700; }
   .tab { background: rgba(255,255,255,0.05); color: #a78bfa; }
   .tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
-  .btn { background: linear-gradient(135deg, #F59E0B, #FCD34D); color: #1e1b4b; padding: 1rem; border-radius: 0.75rem; border: none; cursor: pointer; font-weight: 700; width: 100%; font-size: 1.1rem; transition: all 0.3s; }
+  .btn { background: linear-gradient(135deg, #F59E0B, #FCD34D); color: #1e1b4b; padding: 1rem; border-radius: 0.75rem; border: none; cursor: pointer; font-weight: 700; width: 100%; font-size: 1.1rem; transition: all 0.3s; display: inline-block; text-align: center; }
   .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(245,158,11,0.4); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
   .input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.75rem; border-radius: 0.5rem; width: 100%; }
   .input:focus { border-color: #F59E0B; outline: none; }
   .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 2rem; }
@@ -48,6 +50,31 @@
   /* PDF button */
   .btn-pdf { background: linear-gradient(135deg, #EF4444, #DC2626); color: white; }
   .btn-pdf:hover { box-shadow: 0 10px 30px rgba(239,68,68,0.4); }
+
+  /* MODAL FIX - Solución definitiva al scroll */
+  #licenseModal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    touch-action: none !important;
+  }
+  #licenseModal .modal-content {
+    position: relative;
+    z-index: 10000;
+    margin: auto;
+    max-width: 500px;
+    width: 90%;
+  }
+  #licenseModal.show {
+    display: flex !important;
+  }
 </style>
 </head>
 <body>
@@ -60,13 +87,15 @@
       <div><h1 class="font-bold text-lg">PriceCalc <span class="text-amber-400">Pro</span></h1></div>
     </div>
     <div class="flex items-center gap-3">
-      <button id="installBtn" class="hidden btn px-4 py-2 text-sm w-auto" style="background: linear-gradient(135deg, #10B981, #059669); color: white;">
-        <i class="fas fa-download mr-1"></i> Instalar
+      <button type="button" id="installBtn" class="hidden btn px-4 py-2 text-sm w-auto" style="background: linear-gradient(135deg, #10B981, #059669); color: white;">
+        <i class="fas fa-download mr-1"></i>Instalar
       </button>
       <div id="licenseStatus" class="hidden items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold glass-gold">
         <i class="fas fa-crown text-amber-400"></i><span id="licenseText">PRO</span>
       </div>
-      <button type="button" onclick="openModal(event)" id="activateBtn" class="btn px-4 py-2 text-sm w-auto" style="cursor: pointer;"><i class="fas fa-key mr-1"></i>Activar PRO</button>
+      <button type="button" id="activateBtn" class="btn px-4 py-2 text-sm w-auto" style="max-width: 180px;">
+        <i class="fas fa-key mr-1"></i>Activar PRO
+      </button>
     </div>
   </div>
 </header>
@@ -84,14 +113,16 @@
       
       <!-- Contador Regresivo -->
       <div class="glass-gold rounded-xl p-4 mb-6 text-center border border-amber-400/30">
-        <p class="text-amber-300 font-bold text-lg mb-1"> Oferta de lanzamiento termina en:</p>
+        <p class="text-amber-300 font-bold text-lg mb-1">⏳ Oferta de lanzamiento termina en:</p>
         <p id="countdown" class="text-3xl font-black text-white tracking-wider">00d 00h 00m 00s</p>
       </div>
 
       <p class="text-lg text-purple-200 mb-8">5 calculadoras especializadas, estrategia de precios y simulador de ingresos.</p>
       <div class="flex flex-wrap gap-4">
-        <a href="#calculadora" class="btn px-8 py-4 w-auto inline-block text-center"><i class="fas fa-rocket mr-2"></i>Empezar gratis</a>
-        <button type="button" onclick="openModal(event)" class="btn px-8 py-4 w-auto inline-block text-center" style="background: linear-gradient(135deg, #7C3AED, #5B21B6); color: #fff; cursor: pointer;"><i class="fas fa-crown mr-2"></i>Comprar PRO - $9.90</button>
+        <a href="#calculadora" class="btn px-8 py-4 w-auto inline-block text-center" style="width: auto;"><i class="fas fa-rocket mr-2"></i>Empezar gratis</a>
+        <button type="button" id="btnComprarPro" class="btn px-8 py-4 w-auto inline-block text-center" style="background: linear-gradient(135deg, #7C3AED, #5B21B6); color: #fff; width: auto;">
+          <i class="fas fa-crown mr-2"></i>Comprar PRO - $9.90
+        </button>
       </div>
     </div>
     <div class="relative">
@@ -123,14 +154,14 @@
     <div class="flex flex-wrap gap-2 mb-8 justify-center">
       <button type="button" onclick="switchCalc('curso')" id="tab-curso" class="tab tab-active px-5 py-3 rounded-xl">📊 Curso</button>
       <button type="button" onclick="switchCalc('ebook')" id="tab-ebook" class="tab px-5 py-3 rounded-xl">📚 Ebook</button>
-      <button type="button" onclick="switchCalc('membresia')" id="tab-membresia" class="tab px-5 py-3 rounded-xl"> Membresía</button>
+      <button type="button" onclick="switchCalc('membresia')" id="tab-membresia" class="tab px-5 py-3 rounded-xl">👑 Membresía</button>
       <button type="button" onclick="switchCalc('coaching')" id="tab-coaching" class="tab px-5 py-3 rounded-xl">👥 Coaching</button>
-      <button type="button" onclick="switchCalc('webinar')" id="tab-webinar" class="tab px-5 py-3 rounded-xl"> Webinar</button>
+      <button type="button" onclick="switchCalc('webinar')" id="tab-webinar" class="tab px-5 py-3 rounded-xl">🎤 Webinar</button>
     </div>
 
     <div class="grid lg:grid-cols-2 gap-8">
       <div class="card">
-        <h3 id="calcTitle" class="text-2xl font-bold mb-6"> Curso Online</h3>
+        <h3 id="calcTitle" class="text-2xl font-bold mb-6">📊 Curso Online</h3>
         <div id="calcForm" class="space-y-4"></div>
         <button type="button" onclick="calculate()" class="btn mt-6"><i class="fas fa-rocket mr-2"></i>Calcular precio óptimo</button>
       </div>
@@ -163,7 +194,7 @@
       <i class="fas fa-lock text-4xl text-amber-400 mb-2"></i>
       <p class="font-bold text-lg">Generador de Estrategia 360°</p>
       <p class="text-sm text-gray-300 mt-2">Función Premium - Haz clic para activar</p>
-      <button type="button" onclick="openModal(event)" class="btn mt-4 px-6 py-2 w-auto text-sm">Activar PRO</button>
+      <button type="button" class="btn mt-4 px-6 py-2 w-auto text-sm btn-activar-pro" style="width: auto;">Activar PRO</button>
     </div>
   </div>
   <div class="max-w-7xl mx-auto" id="content-estrategia">
@@ -179,7 +210,7 @@
     </div>
     <div id="strategyResults" class="grid md:grid-cols-3 gap-6 hidden">
       <div class="card hover:transform hover:scale-105 transition-transform">
-        <h4 class="font-bold text-lg mb-2 text-blue-400"> Lanzamiento</h4>
+        <h4 class="font-bold text-lg mb-2 text-blue-400">🚀 Lanzamiento</h4>
         <div class="text-3xl font-black text-blue-400 mb-4" id="stratLaunchPrice">$0</div>
         <div class="text-sm text-gray-400" id="stratLaunchDetails"></div>
         <div class="mt-4 pt-4 border-t border-white/10">
@@ -206,7 +237,7 @@
         </div>
       </div>
     </div>
-    <button type="button" onclick="exportPDF()" id="exportPdfBtn" class="btn btn-pdf mt-8 hidden w-auto mx-auto block">
+    <button type="button" onclick="exportPDF()" id="exportPdfBtn" class="btn btn-pdf mt-8 hidden w-auto mx-auto block" style="width: auto;">
       <i class="fas fa-file-pdf mr-2"></i>Exportar estrategia a PDF
     </button>
   </div>
@@ -219,7 +250,7 @@
       <i class="fas fa-lock text-4xl text-amber-400 mb-2"></i>
       <p class="font-bold text-lg">Simulador de Ingresos Hotmart</p>
       <p class="text-sm text-gray-300 mt-2">Función Premium - Haz clic para activar</p>
-      <button type="button" onclick="openModal(event)" class="btn mt-4 px-6 py-2 w-auto text-sm">Activar PRO</button>
+      <button type="button" class="btn mt-4 px-6 py-2 w-auto text-sm btn-activar-pro" style="width: auto;">Activar PRO</button>
     </div>
   </div>
   <div class="max-w-7xl mx-auto" id="content-simulador">
@@ -316,7 +347,7 @@
           <p><strong>Garantía de 7 días:</strong> Si no estás 100% satisfecho, te devolvemos tu dinero. Sin preguntas.</p>
         </div>
       </div>
-      <button type="button" onclick="copyText()" class="btn w-auto px-6">
+      <button type="button" onclick="copyText()" class="btn w-auto px-6" style="width: auto;">
         <i class="fas fa-copy mr-2"></i>Copiar todo el copy
       </button>
     </div>
@@ -355,10 +386,12 @@
   </div>
 </footer>
 
-<!-- Modal Licencia -->
-<div id="licenseModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);">
-  <div class="glass rounded-2xl p-8 max-w-md w-full relative border border-amber-400/30">
-    <button type="button" onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+<!-- Modal Licencia - VERSIÓN CORREGIDA -->
+<div id="licenseModal">
+  <div class="modal-content glass rounded-2xl p-8 relative border border-amber-400/30">
+    <button type="button" id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-white" style="background: none; border: none; cursor: pointer; font-size: 1.5rem;">
+      <i class="fas fa-times"></i>
+    </button>
     <div class="text-center mb-6">
       <div class="w-16 h-16 mx-auto rounded-2xl gradient-gold flex items-center justify-center mb-4">
         <i class="fas fa-key text-3xl text-purple-900"></i>
@@ -369,11 +402,11 @@
     <input type="text" id="licenseInput" placeholder="XXXX-XXXX-XXXX" class="input w-full px-4 py-4 rounded-xl text-center text-lg font-mono uppercase mb-4 tracking-wider">
     <div id="licenseError" class="hidden text-red-400 text-sm mb-4 text-center"></div>
     <div id="licenseSuccess" class="hidden text-green-400 text-sm mb-4 text-center"></div>
-    <button type="button" onclick="verificarLicencia(document.getElementById('licenseInput').value.trim().toUpperCase())" class="btn">
+    <button type="button" id="verifyLicenseBtn" class="btn">
       <i class="fas fa-unlock mr-2"></i>Activar PRO
     </button>
     <div class="mt-4 text-center">
-      <a href="https://pay.hotmart.com/TU_LINK_AQUI" target="_blank" class="text-amber-400 text-sm hover:underline">¿No tienes licencia? Comprar aquí</a>
+      <a href="https://pay.hotmart.com/TU_LINK_AQUI" target="_blank" rel="noopener noreferrer" class="text-amber-400 text-sm hover:underline">¿No tienes licencia? Comprar aquí</a>
     </div>
   </div>
 </div>
@@ -386,9 +419,70 @@ const LICENSE_URL = 'https://raw.githubusercontent.com/tenderoalbertalberto-rgb/
 let currentCalc = 'curso';
 let deferredPrompt;
 let isPro = false;
+let scrollPosition = 0;
 
 // ==========================================
-// 2. SISTEMA DE LICENCIAS
+// 2. SISTEMA DE MODAL CORREGIDO (SIN SCROLL)
+// ==========================================
+function openModal(e) {
+  // Prevenir cualquier comportamiento por defecto
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+  }
+  
+  const modal = document.getElementById('licenseModal');
+  
+  // Guardar posición del scroll
+  scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+  
+  // Bloquear scroll del body de forma robusta
+  document.body.classList.add('modal-open');
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${scrollPosition}px`;
+  document.body.style.width = '100%';
+  
+  // Mostrar modal
+  modal.classList.add('show');
+  modal.classList.remove('hidden');
+  
+  // Limpiar estados
+  document.getElementById('licenseError').classList.add('hidden');
+  document.getElementById('licenseSuccess').classList.add('hidden');
+  document.getElementById('licenseInput').value = '';
+  
+  // Focus en el input
+  setTimeout(() => {
+    document.getElementById('licenseInput').focus();
+  }, 100);
+  
+  return false;
+}
+
+function closeModal() {
+  const modal = document.getElementById('licenseModal');
+  modal.classList.remove('show');
+  modal.classList.add('hidden');
+  
+  // Restaurar scroll del body
+  document.body.classList.remove('modal-open');
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.width = '';
+  
+  // Restaurar posición del scroll
+  window.scrollTo(0, scrollPosition);
+  
+  return false;
+}
+
+// ==========================================
+// 3. SISTEMA DE LICENCIAS
 // ==========================================
 function desbloquearPremium() {
   isPro = true;
@@ -412,10 +506,6 @@ function desbloquearPremium() {
   activateBtn.innerHTML = '<i class="fas fa-check mr-1"></i>PRO Activo';
   activateBtn.disabled = true;
   activateBtn.classList.add('opacity-50', 'cursor-not-allowed');
-  activateBtn.onclick = null;
-  
-  // Guardar
-  localStorage.setItem('pricecalc_pro_activated', 'true');
 }
 
 function verificarLicencia(codigo) {
@@ -431,7 +521,6 @@ function verificarLicencia(codigo) {
     return;
   }
 
-  // Fetch licenses
   fetch(LICENSE_URL + '?t=' + Date.now())
     .then(res => {
       if (!res.ok) throw new Error('Network error');
@@ -459,54 +548,8 @@ function verificarLicencia(codigo) {
     });
 }
 
-function openModal(event) {
-  // Prevenir cualquier comportamiento por defecto
-  if (event) {
-    event.preventDefault();
-    event.stopPropagation();
-  }
-  
-  const modal = document.getElementById('licenseModal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-  document.getElementById('licenseError').classList.add('hidden');
-  document.getElementById('licenseSuccess').classList.add('hidden');
-  document.getElementById('licenseInput').value = '';
-  
-  // Prevenir scroll del body
-  document.body.style.overflow = 'hidden';
-  
-  // Focus en el input
-  setTimeout(() => {
-    document.getElementById('licenseInput').focus();
-  }, 100);
-}
-
-function closeModal() {
-  const modal = document.getElementById('licenseModal');
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
-  
-  // Restaurar scroll del body
-  document.body.style.overflow = 'auto';
-}
-
-// Cerrar modal al hacer clic fuera
-document.getElementById('licenseModal').addEventListener('click', function(e) {
-  if (e.target === this) {
-    closeModal();
-  }
-});
-
-// Cerrar modal con tecla ESC
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    closeModal();
-  }
-});
-
 // ==========================================
-// 3. PWA INSTALABLE
+// 4. PWA INSTALABLE
 // ==========================================
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
@@ -533,7 +576,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // ==========================================
-// 4. CONTADOR REGRESIVO (7 Días)
+// 5. CONTADOR REGRESIVO (7 Días)
 // ==========================================
 let savedDeadline = localStorage.getItem('pricecalc_deadline');
 if (!savedDeadline) {
@@ -565,11 +608,11 @@ setInterval(updateCountdown, 1000);
 updateCountdown();
 
 // ==========================================
-// 5. LÓGICA DE CALCULADORAS
+// 6. LÓGICA DE CALCULADORAS
 // ==========================================
 const configs = {
   curso: {
-    title: '📊 Curso Online',
+    title: ' Curso Online',
     fields: [
       {id: 'fixed', label: 'Costos fijos totales ($)', value: 2000, desc: 'Grabación, plataforma, marketing'},
       {id: 'var', label: 'Costo variable por alumno ($)', value: 10, desc: 'Soporte, certificados'},
@@ -628,7 +671,6 @@ const configs = {
 function switchCalc(type) {
   currentCalc = type;
   
-  // Update tabs
   document.querySelectorAll('[id^="tab-"]').forEach(t => {
     t.classList.remove('tab-active');
     t.classList.add('tab');
@@ -636,7 +678,6 @@ function switchCalc(type) {
   document.getElementById('tab-' + type).classList.remove('tab');
   document.getElementById('tab-' + type).classList.add('tab-active');
   
-  // Update form
   const cfg = configs[type];
   document.getElementById('calcTitle').textContent = cfg.title;
   document.getElementById('resultCard').classList.add('hidden');
@@ -696,7 +737,6 @@ function calcularEbook() {
     niche: getInputValue('niche')
   };
   
-  // Base price: $0.10-$0.20 per page adjusted by competition
   const basePrice = (v.pages * 0.15) * (1 + (10 - v.niche)/20);
   let price = basePrice * (1 + v.margin/100);
   
@@ -725,7 +765,7 @@ function calcularMembresia() {
   };
   
   const monthlyCost = (v.fixed / Math.max(1, v.sales)) + v.var;
-  const ltvFactor = 1 / (v.churn/100); // Average lifetime in months
+  const ltvFactor = 1 / (v.churn/100);
   let price = (v.ltv / ltvFactor) * (1 + v.margin/100);
   price = Math.max(price, monthlyCost / (1 - v.margin/100));
   
@@ -753,9 +793,9 @@ function calcularCoaching() {
     exp: getInputValue('exp')
   };
   
-  const hourlyRate = (v.exp * 50) + 100; // Base rate by experience
+  const hourlyRate = (v.exp * 50) + 100;
   const costPerClient = (v.fixed / Math.max(1, v.sales)) + v.var;
-  let price = Math.max(hourlyRate * 4, costPerClient / (1 - v.margin/100)); // 4 sessions per month
+  let price = Math.max(hourlyRate * 4, costPerClient / (1 - v.margin/100));
   
   const minPrice = price * 0.8;
   const maxPriceRange = price * 1.5;
@@ -828,35 +868,31 @@ function calculate() {
 }
 
 // ==========================================
-// 6. GENERADOR DE ESTRATEGIA 360°
+// 7. GENERADOR DE ESTRATEGIA 360°
 // ==========================================
 function generateStrategy() {
   const value = parseFloat(document.getElementById('stratValue').value) || 2000;
   const audience = parseFloat(document.getElementById('stratAudience').value) || 5000;
   const ads = parseFloat(document.getElementById('stratAds').value) || 1000;
   
-  // Escenario 1: Lanzamiento
   const launchPrice = Math.max(27, value * 0.15);
-  const launchConv = 0.03 * (1 + ads/2000); // 3% base, aumenta con ads
+  const launchConv = 0.03 * (1 + ads/2000);
   const launchSales = Math.floor(audience * launchConv);
   const launchRevenue = launchSales * launchPrice;
-  const launchNet = launchRevenue * 0.901; // After Hotmart fee
+  const launchNet = launchRevenue * 0.901;
   
-  // Escenario 2: Evergreen (RECOMENDADO)
   const evergreenPrice = Math.max(47, value * 0.25);
-  const evergreenConv = 0.015; // 1.5% mensual
+  const evergreenConv = 0.015;
   const evergreenSales = Math.floor(audience * evergreenConv);
   const evergreenRevenue = evergreenSales * evergreenPrice;
-  const evergreenNet = evergreenRevenue * 0.901 * 30; // Mensual
+  const evergreenNet = evergreenRevenue * 0.901 * 30;
   
-  // Escenario 3: Webinar
   const webinarPrice = Math.max(97, value * 0.4);
-  const webinarConv = 0.008 * 0.7; // 0.8% de la audiencia asiste, 70% compra
+  const webinarConv = 0.008 * 0.7;
   const webinarSales = Math.floor(audience * webinarConv);
   const webinarRevenue = webinarSales * webinarPrice;
   const webinarNet = webinarRevenue * 0.901;
   
-  // Mostrar resultados
   document.getElementById('stratLaunchPrice').textContent = '$' + launchPrice.toFixed(0);
   document.getElementById('stratEvergreenPrice').textContent = '$' + evergreenPrice.toFixed(0);
   document.getElementById('stratWebinarPrice').textContent = '$' + webinarPrice.toFixed(0);
@@ -887,7 +923,7 @@ function generateStrategy() {
 }
 
 // ==========================================
-// 7. SIMULADOR DE INGRESOS HOTMART
+// 8. SIMULADOR DE INGRESOS HOTMART
 // ==========================================
 function updateSimulator() {
   const units = parseInt(document.getElementById('simUnits').value) || 0;
@@ -907,7 +943,6 @@ function updateSimulator() {
   const net = Math.max(0, netBeforeAds - adsCost);
   const netPerUnit = units > 0 ? net / units : 0;
   
-  // ROI calculation
   const totalCost = adsCost;
   const roi = totalCost > 0 ? ((net - totalCost) / totalCost) * 100 : 0;
   
@@ -923,17 +958,15 @@ function updateSimulator() {
 }
 
 // ==========================================
-// 8. EXPORTAR A PDF
+// 9. EXPORTAR A PDF
 // ==========================================
 async function exportPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   
-  // Configurar colores
-  const primaryColor = [124, 58, 237]; // Purple
-  const secondaryColor = [245, 158, 11]; // Amber
+  const primaryColor = [124, 58, 237];
+  const secondaryColor = [245, 158, 11];
   
-  // Header
   doc.setFillColor(...primaryColor);
   doc.rect(0, 0, 210, 40, 'F');
   doc.setTextColor(255, 255, 255);
@@ -944,7 +977,6 @@ async function exportPDF() {
   
   let yPos = 60;
   
-  // Calculadora actual
   doc.setTextColor(...primaryColor);
   doc.setFontSize(16);
   doc.text(configs[currentCalc].title, 14, yPos);
@@ -961,7 +993,6 @@ async function exportPDF() {
   doc.text(`Punto de equilibrio: ${document.getElementById('resultBreakeven').textContent}`, 14, yPos);
   yPos += 15;
   
-  // Estrategia
   if (!document.getElementById('strategyResults').classList.contains('hidden')) {
     doc.setFillColor(...secondaryColor);
     doc.rect(14, yPos - 5, 182, 10, 'F');
@@ -973,23 +1004,19 @@ async function exportPDF() {
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(12);
     
-    // Lanzamiento
-    doc.text('🚀 Lanzamiento:', 14, yPos);
+    doc.text('Lanzamiento:', 14, yPos);
     doc.text(`${document.getElementById('stratLaunchPrice').textContent}`, 100, yPos);
     yPos += 8;
     
-    // Evergreen
-    doc.text('♾️ Evergreen (Recomendado):', 14, yPos);
+    doc.text('Evergreen (Recomendado):', 14, yPos);
     doc.text(`${document.getElementById('stratEvergreenPrice').textContent}`, 100, yPos);
     yPos += 8;
     
-    // Webinar
-    doc.text('🎤 Webinar:', 14, yPos);
+    doc.text('Webinar:', 14, yPos);
     doc.text(`${document.getElementById('stratWebinarPrice').textContent}`, 100, yPos);
     yPos += 15;
   }
   
-  // Simulador
   if (isPro) {
     doc.setFillColor(...primaryColor);
     doc.rect(14, yPos - 5, 182, 10, 'F');
@@ -1009,17 +1036,15 @@ async function exportPDF() {
     doc.text(`ROI: ${document.getElementById('simRoi').textContent}`, 14, yPos);
   }
   
-  // Footer
   doc.setTextColor(128, 128, 128);
   doc.setFontSize(10);
   doc.text('Generado por PriceCalc Pro - ' + new Date().toLocaleDateString(), 105, 280, { align: 'center' });
   
-  // Guardar
   doc.save('pricecalc-estrategia-' + new Date().getTime() + '.pdf');
 }
 
 // ==========================================
-// 9. COPY DE VENTAS
+// 10. COPY DE VENTAS
 // ==========================================
 function copyText() {
   const copy = `🔥 OFERTA DE LANZAMIENTO - PriceCalc Pro
@@ -1037,7 +1062,7 @@ Precio especial: $9.90 USD (normal $19)
 📊 RESULTADOS:
 "La inversión de $9.90 se pagó sola el primer día" - María G.
 
- GARANTÍA:
+🎯 GARANTÍA:
 7 días de garantía. Si no estás satisfecho, te devolvemos tu dinero.
 
 👉 Compra ahora: [TU_LINK_AQUI]`;
@@ -1048,7 +1073,7 @@ Precio especial: $9.90 USD (normal $19)
 }
 
 // ==========================================
-// 10. INICIALIZACIÓN
+// 11. INICIALIZACIÓN Y EVENT LISTENERS
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
   // Check license
@@ -1064,6 +1089,111 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Countdown
   updateCountdown();
+  
+  // ==========================================
+  // EVENT LISTENERS PARA MODAL (SOLUCIÓN DEFINITIVA)
+  // ==========================================
+  
+  // Botón "Comprar PRO" del hero
+  const btnComprarPro = document.getElementById('btnComprarPro');
+  if (btnComprarPro) {
+    btnComprarPro.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      openModal(e);
+      return false;
+    });
+  }
+  
+  // Botón "Activar PRO" del header
+  const activateBtn = document.getElementById('activateBtn');
+  if (activateBtn) {
+    activateBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      openModal(e);
+      return false;
+    });
+  }
+  
+  // Botones "Activar PRO" en las secciones premium bloqueadas
+  document.querySelectorAll('.btn-activar-pro').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      openModal(e);
+      return false;
+    });
+  });
+  
+  // Click en los overlays de las secciones premium
+  document.querySelectorAll('.premium-lock-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+      // Solo abrir si se hizo clic en el overlay, no en el botón
+      if (e.target === this || e.target.closest('.btn-activar-pro') === null) {
+        e.preventDefault();
+        e.stopPropagation();
+        openModal(e);
+      }
+    });
+  });
+  
+  // Botón cerrar del modal
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeModal();
+      return false;
+    });
+  }
+  
+  // Botón verificar licencia
+  const verifyLicenseBtn = document.getElementById('verifyLicenseBtn');
+  if (verifyLicenseBtn) {
+    verifyLicenseBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const codigo = document.getElementById('licenseInput').value.trim().toUpperCase();
+      verificarLicencia(codigo);
+      return false;
+    });
+  }
+  
+  // Cerrar modal al hacer clic fuera (en el fondo)
+  const modal = document.getElementById('licenseModal');
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+  }
+  
+  // Cerrar modal con tecla ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('licenseModal');
+      if (modal && modal.classList.contains('show')) {
+        closeModal();
+      }
+    }
+  });
+  
+  // Prevenir scroll con rueda del mouse cuando el modal está abierto
+  modal.addEventListener('wheel', function(e) {
+    if (e.target === this) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+  
+  // Prevenir scroll táctil cuando el modal está abierto
+  modal.addEventListener('touchmove', function(e) {
+    if (e.target === this) {
+      e.preventDefault();
+    }
+  }, { passive: false });
 });
 </script>
 </body>

@@ -373,7 +373,7 @@ function updateCountdown() {
     `${days}d ${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
 }
 setInterval(updateCountdown, 1000);
-updateCountdown();
+updateCountdown(); // Llamada inicial
 
 // ==========================================
 // 5. LÓGICA DE CALCULADORAS

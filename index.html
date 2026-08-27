@@ -456,71 +456,75 @@ function switchCalc(type) {
   `).join('');
 }
 
+// Función auxiliar para leer inputs dinámicamente al hacer clic
+function getInputValue(id) {
+  const el = document.getElementById('f-' + id);
+  return el ? (parseFloat(el.value) || 0) : 0;
+}
+
+function calcularCurso() {
+  const v = { fixed: getInputValue('fixed'), var: getInputValue('var'), sales: getInputValue('sales'), margin: getInputValue('margin'), value: getInputValue('value'), capture: getInputValue('capture') };
+  const costPerStudent = (v.fixed / Math.max(1, v.sales)) + v.var;
+  let price = costPerStudent / (1 - v.margin/100);
+  price = Math.min(price, v.value * (v.capture/100));
+  return { price: price, min: price * 0.8, max: price * 1.3, margin: v.margin, breakeven: Math.ceil(v.fixed / Math.max(1, price - v.var)), advice: `Con valor percibido de $${v.value}, puedes posicionarte entre $${(price*0.8).toFixed(0)} y $${(price*1.3).toFixed(0)}. Óptimo: $${price.toFixed(0)}.` };
+}
+
+function calcularEbook() {
+  const v = { fixed: getInputValue('fixed'), var: getInputValue('var'), sales: getInputValue('sales'), margin: getInputValue('margin'), pages: getInputValue('pages'), niche: getInputValue('niche') };
+  const basePrice = (v.pages * 0.15) * (1 + v.niche/20);
+  let price = basePrice * (1 + v.margin/100);
+  return { price: price, min: price * 0.7, max: price * 1.4, margin: v.margin, breakeven: Math.ceil(v.fixed / Math.max(1, price)), advice: `Ebooks de ${v.pages} páginas con competencia ${v.niche}/10: entre $${(price*0.7).toFixed(0)} y $${(price*1.4).toFixed(0)}. Sugerido: $${price.toFixed(0)}.` };
+}
+
+function calcularMembresia() {
+  const v = { fixed: getInputValue('fixed'), var: getInputValue('var'), sales: getInputValue('sales'), margin: getInputValue('margin'), churn: getInputValue('churn'), ltv: getInputValue('ltv') };
+  const monthlyCost = (v.fixed / Math.max(1, v.sales)) + v.var;
+  const ltvFactor = 1 / (v.churn/100);
+  let price = (v.ltv / ltvFactor) * (1 + v.margin/100);
+  price = Math.max(price, monthlyCost / (1 - v.margin/100));
+  return { price: price, min: price * 0.85, max: price * 1.25, margin: v.margin, breakeven: Math.ceil(v.fixed / Math.max(1, price - v.var)), advice: `Con churn ${v.churn}%, LTV es $${v.ltv}. Precio mensual óptimo: $${price.toFixed(0)}.` };
+}
+
+function calcularCoaching() {
+  const v = { fixed: getInputValue('fixed'), var: getInputValue('var'), sales: getInputValue('sales'), margin: getInputValue('margin'), hours: getInputValue('hours'), exp: getInputValue('exp') };
+  const hourlyRate = (v.exp * 50) + 100;
+  const costPerClient = (v.fixed / Math.max(1, v.sales)) + v.var;
+  let price = Math.max(hourlyRate * 4, costPerClient / (1 - v.margin/100));
+  return { price: price, min: price * 0.8, max: price * 1.5, margin: v.margin, breakeven: Math.ceil(v.fixed / Math.max(1, price - v.var)), advice: `Con ${v.exp} años experiencia, tarifa base $${hourlyRate}. Paquete mensual: $${price.toFixed(0)}.` };
+}
+
+function calcularWebinar() {
+  const v = { fixed: getInputValue('fixed'), var: getInputValue('var'), sales: getInputValue('sales'), margin: getInputValue('margin'), conv: getInputValue('conv'), upsell: getInputValue('upsell') };
+  const costPerAttendee = (v.fixed / Math.max(1, v.sales)) + v.var;
+  const expectedSales = v.sales * (v.conv/100);
+  const revenuePerAttendee = v.upsell * (v.conv/100);
+  let price = Math.max(revenuePerAttendee * 0.3, costPerAttendee / (1 - v.margin/100));
+  return { price: price, min: price * 0.5, max: price * 2, margin: v.margin, breakeven: Math.ceil(v.fixed / Math.max(1, price * v.conv/100 - v.var)), advice: `Con ${v.sales} asistentes y ${v.conv}% conversión, genera ~$${(expectedSales * v.upsell).toFixed(0)} en upsells.` };
+}
+
 function calculate() {
-  const cfg = configs[currentCalc];
-  const v = {};
+  let res;
+  if (currentCalc === 'curso') res = calcularCurso();
+  else if (currentCalc === 'ebook') res = calcularEbook();
+  else if (currentCalc === 'membresia') res = calcularMembresia();
+  else if (currentCalc === 'coaching') res = calcularCoaching();
+  else if (currentCalc === 'webinar') res = calcularWebinar();
   
-  // Leer valores DINÁMICAMENTE del DOM
-  cfg.fields.forEach(f => {
-    const input = document.getElementById('f-' + f.id);
-    v[f.id] = input ? parseFloat(input.value) || 0 : 0;
-  });
+  if (!res) return;
 
-  let price = 0, min = 0, max = 0, margin = 0, breakeven = 0, advice = '';
-
-  if (currentCalc === 'curso') {
-    const costPerStudent = (v.fixed / v.sales) + v.var;
-    price = costPerStudent / (1 - v.margin/100);
-    const valuePrice = v.value * (v.capture/100);
-    price = Math.min(price, valuePrice);
-    min = price * 0.8; max = price * 1.3; margin = v.margin;
-    breakeven = Math.ceil(v.fixed / Math.max(1, price - v.var));
-    advice = `Con valor percibido de $${v.value}, puedes posicionarte entre $${min.toFixed(0)} y $${max.toFixed(0)}. Óptimo: $${price.toFixed(0)}.`;
-  } else if (currentCalc === 'ebook') {
-    const basePrice = (v.pages * 0.15) * (1 + v.niche/20);
-    price = basePrice * (1 + v.margin/100);
-    min = price * 0.7; max = price * 1.4; margin = v.margin;
-    breakeven = Math.ceil(v.fixed / Math.max(1, price));
-    advice = `Ebooks de ${v.pages} páginas con competencia ${v.niche}/10: entre $${min.toFixed(0)} y $${max.toFixed(0)}. Sugerido: $${price.toFixed(0)}.`;
-  } else if (currentCalc === 'membresia') {
-    const monthlyCost = (v.fixed / v.sales) + v.var;
-    const ltvFactor = 1 / (v.churn/100);
-    price = (v.ltv / ltvFactor) * (1 + v.margin/100);
-    price = Math.max(price, monthlyCost / (1 - v.margin/100));
-    min = price * 0.85; max = price * 1.25; margin = v.margin;
-    breakeven = Math.ceil(v.fixed / Math.max(1, price - v.var));
-    advice = `Con churn ${v.churn}%, LTV es $${v.ltv}. Precio mensual óptimo: $${price.toFixed(0)}.`;
-  } else if (currentCalc === 'coaching') {
-    const hourlyRate = (v.exp * 50) + 100;
-    const costPerClient = (v.fixed / v.sales) + v.var;
-    price = Math.max(hourlyRate * 4, costPerClient / (1 - v.margin/100));
-    min = price * 0.8; max = price * 1.5; margin = v.margin;
-    breakeven = Math.ceil(v.fixed / Math.max(1, price - v.var));
-    advice = `Con ${v.exp} años experiencia, tarifa base $${hourlyRate}. Paquete mensual: $${price.toFixed(0)}.`;
-  } else if (currentCalc === 'webinar') {
-    const costPerAttendee = (v.fixed / v.sales) + v.var;
-    const expectedSales = v.sales * (v.conv/100);
-    const revenuePerAttendee = v.upsell * (v.conv/100);
-    price = Math.max(revenuePerAttendee * 0.3, costPerAttendee / (1 - v.margin/100));
-    min = price * 0.5; max = price * 2; margin = v.margin;
-    breakeven = Math.ceil(v.fixed / Math.max(1, price - v.var));
-    advice = `Con ${v.sales} asistentes y ${v.conv}% conversión, genera ~$${(expectedSales * v.upsell).toFixed(0)} en upsells.`;
-  }
-
-  // ACTUALIZAR LA INTERFAZ con los IDs correctos
-  document.getElementById('resultPrice').textContent = '$' + price.toFixed(0);
-  document.getElementById('resultMin').textContent = '$' + min.toFixed(0);
-  document.getElementById('resultMax').textContent = '$' + max.toFixed(0);
-  document.getElementById('resultMargin').textContent = margin.toFixed(0) + '%';
-  document.getElementById('resultBreakeven').textContent = breakeven + ' ventas';
-  document.getElementById('resultAdvice').textContent = advice;
+  const cfg = configs[currentCalc];
+  document.getElementById('resultPrice').textContent = '$' + res.price.toFixed(0);
+  document.getElementById('resultMin').textContent = '$' + res.min.toFixed(0);
+  document.getElementById('resultMax').textContent = '$' + res.max.toFixed(0);
+  document.getElementById('resultMargin').textContent = res.margin.toFixed(0) + '%';
+  document.getElementById('resultBreakeven').textContent = res.breakeven + ' ventas';
+  document.getElementById('resultAdvice').textContent = res.advice;
   document.getElementById('resultSubtitle').textContent = 'Precio sugerido para ' + cfg.title;
-
-  // Mostrar la tarjeta de resultados
+  
   document.getElementById('resultCard').classList.remove('hidden');
   document.getElementById('emptyResult').classList.add('hidden');
 }
-
 function generateStrategy() {
   const value = parseFloat(document.getElementById('stratValue').value) || 2000;
   const audience = parseFloat(document.getElementById('stratAudience').value) || 5000;

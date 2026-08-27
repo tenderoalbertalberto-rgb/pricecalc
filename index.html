@@ -8,6 +8,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   * { font-family: system-ui, sans-serif; box-sizing: border-box; }
   body { background: #0f0720; color: #fff; margin: 0; overflow-x: hidden; }
@@ -29,14 +30,24 @@
   .float { animation: float 3s ease-in-out infinite; }
   .hero-blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3; }
   
-  /* Estilos para funciones premium bloqueadas */
+  /* Premium lock styles */
   .funcion-premium { position: relative; transition: all 0.3s; }
-  .funcion-premium.locked { opacity: 0.4; pointer-events: none; filter: blur(2px); }
+  .funcion-premium.locked { opacity: 0.6; }
   .premium-lock-overlay {
     position: absolute; inset: 0; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; background: rgba(15,7,32,0.6);
-    border-radius: 1rem; z-index: 10; backdrop-filter: blur(4px);
+    align-items: center; justify-content: center; background: rgba(15,7,32,0.7);
+    border-radius: 1rem; z-index: 10; backdrop-filter: blur(4px); cursor: pointer;
   }
+  .premium-lock-overlay:hover { background: rgba(15,7,32,0.8); }
+  
+  /* Range slider */
+  input[type=range] { -webkit-appearance: none; background: transparent; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #F59E0B; cursor: pointer; margin-top: -8px; }
+  input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: rgba(255,255,255,0.2); border-radius: 2px; }
+  
+  /* PDF button */
+  .btn-pdf { background: linear-gradient(135deg, #EF4444, #DC2626); color: white; }
+  .btn-pdf:hover { box-shadow: 0 10px 30px rgba(239,68,68,0.4); }
 </style>
 </head>
 <body>
@@ -50,12 +61,12 @@
     </div>
     <div class="flex items-center gap-3">
       <button id="installBtn" class="hidden btn px-4 py-2 text-sm w-auto" style="background: linear-gradient(135deg, #10B981, #059669); color: white;">
-        <i class="fas fa-download mr-1"></i>📲 Instalar App
+        <i class="fas fa-download mr-1"></i>📲 Instalar
       </button>
       <div id="licenseStatus" class="hidden items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold glass-gold">
-        <i class="fas fa-crown text-amber-400"></i><span id="licenseText">PRO Activo</span>
+        <i class="fas fa-crown text-amber-400"></i><span id="licenseText">PRO</span>
       </div>
-      <a href="https://pay.hotmart.com/TU_LINK_AQUI" target="_blank" rel="noopener noreferrer" class="btn px-4 py-2 text-sm w-auto" style="cursor: pointer;"><i class="fas fa-shopping-cart mr-1"></i>Comprar PRO - $9.90</a>
+      <button onclick="openModal()" id="activateBtn" class="btn px-4 py-2 text-sm w-auto" style="cursor: pointer;"><i class="fas fa-key mr-1"></i>Activar PRO</button>
     </div>
   </div>
 </header>
@@ -80,7 +91,7 @@
       <p class="text-lg text-purple-200 mb-8">5 calculadoras especializadas, estrategia de precios y simulador de ingresos.</p>
       <div class="flex flex-wrap gap-4">
         <a href="#calculadora" class="btn px-8 py-4 w-auto inline-block text-center"><i class="fas fa-rocket mr-2"></i>Empezar gratis</a>
-       <a href="https://pay.hotmart.com/TU_LINK_AQUI" target="_blank" rel="noopener noreferrer" class="btn px-8 py-4 w-auto inline-block text-center" style="background: linear-gradient(135deg, #7C3AED, #5B21B6); color: #fff; cursor: pointer;"><i class="fas fa-shopping-cart mr-2"></i>Comprar PRO - $9.90</a> 
+        <button onclick="openModal()" class="btn px-8 py-4 w-auto inline-block text-center" style="background: linear-gradient(135deg, #7C3AED, #5B21B6); color: #fff; cursor: pointer;"><i class="fas fa-crown mr-2"></i>Comprar PRO - $9.90</button>
       </div>
     </div>
     <div class="relative">
@@ -134,7 +145,7 @@
           <div class="glass rounded-xl p-4"><div class="text-xs text-gray-400 mb-1">Margen neto</div><div class="text-xl font-bold text-green-400" id="resultMargin">0%</div></div>
           <div class="glass rounded-xl p-4"><div class="text-xs text-gray-400 mb-1">Punto de equilibrio</div><div class="text-xl font-bold" id="resultBreakeven">0 ventas</div></div>
         </div>
-        <div class="glass rounded-xl p-4"><div class="text-xs text-gray-400 mb-2">💡 Recomendación</div><p class="text-sm" id="resultAdvice">-</p></div>
+        <div class="glass rounded-xl p-4"><div class="text-xs text-gray-400 mb-2"> Recomendación</div><p class="text-sm" id="resultAdvice">-</p></div>
       </div>
 
       <div id="emptyResult" class="card text-center">
@@ -147,13 +158,16 @@
 
 <!-- Estrategia (Premium) -->
 <section id="estrategia" class="funcion-premium locked py-16 px-4">
-  <div class="premium-lock-overlay" id="lock-estrategia">
-    <i class="fas fa-lock text-4xl text-amber-400 mb-2"></i>
-    <p class="font-bold text-lg">Función Premium</p>
-    <button onclick="openModal()" class="btn mt-4 px-6 py-2 w-auto text-sm">Activar para desbloquear</button>
+  <div class="premium-lock-overlay" id="lock-estrategia" onclick="openModal()">
+    <div class="text-center">
+      <i class="fas fa-lock text-4xl text-amber-400 mb-2"></i>
+      <p class="font-bold text-lg">Generador de Estrategia 360°</p>
+      <p class="text-sm text-gray-300 mt-2">Función Premium - Haz clic para activar</p>
+      <button onclick="openModal(); event.stopPropagation();" class="btn mt-4 px-6 py-2 w-auto text-sm">Activar PRO</button>
+    </div>
   </div>
-  <div class="max-w-7xl mx-auto">
-    <div class="text-center mb-12"><h2 class="text-3xl font-black mb-4">Generador de <span class="text-amber-400">estrategia</span></h2></div>
+  <div class="max-w-7xl mx-auto" id="content-estrategia">
+    <div class="text-center mb-12"><h2 class="text-3xl font-black mb-4">Generador de <span class="text-amber-400">estrategia</span> 360°</h2></div>
     <div class="card mb-8">
       <h3 class="text-xl font-bold mb-6">Datos de tu producto</h3>
       <div class="grid md:grid-cols-3 gap-4">
@@ -164,41 +178,147 @@
       <button onclick="generateStrategy()" class="btn mt-6"><i class="fas fa-magic mr-2"></i>Generar estrategia</button>
     </div>
     <div id="strategyResults" class="grid md:grid-cols-3 gap-6 hidden">
-      <div class="card"><h4 class="font-bold text-lg mb-2 text-blue-400">🚀 Lanzamiento</h4><div class="text-3xl font-black text-blue-400 mb-4" id="stratLaunchPrice">$0</div><div class="text-sm text-gray-400" id="stratLaunchDetails"></div></div>
-      <div class="card border-2 border-amber-400"><h4 class="font-bold text-lg mb-2 text-amber-400">♾️ Evergreen ⭐</h4><div class="text-3xl font-black text-amber-400 mb-4" id="stratEvergreenPrice">$0</div><div class="text-sm text-gray-400" id="stratEvergreenDetails"></div></div>
-      <div class="card"><h4 class="font-bold text-lg mb-2 text-pink-400">🎤 Webinar</h4><div class="text-3xl font-black text-pink-400 mb-4" id="stratWebinarPrice">$0</div><div class="text-sm text-gray-400" id="stratWebinarDetails"></div></div>
+      <div class="card hover:transform hover:scale-105 transition-transform">
+        <h4 class="font-bold text-lg mb-2 text-blue-400">🚀 Lanzamiento</h4>
+        <div class="text-3xl font-black text-blue-400 mb-4" id="stratLaunchPrice">$0</div>
+        <div class="text-sm text-gray-400" id="stratLaunchDetails"></div>
+        <div class="mt-4 pt-4 border-t border-white/10">
+          <p class="text-xs text-gray-500">Alta conversión inicial</p>
+        </div>
+      </div>
+      <div class="card border-2 border-amber-400 hover:transform hover:scale-105 transition-transform">
+        <div class="flex items-center justify-between mb-2">
+          <h4 class="font-bold text-lg text-amber-400">♾️ Evergreen</h4>
+          <span class="px-2 py-1 bg-amber-400/20 text-amber-400 text-xs rounded-full">⭐ REC</span>
+        </div>
+        <div class="text-3xl font-black text-amber-400 mb-4" id="stratEvergreenPrice">$0</div>
+        <div class="text-sm text-gray-400" id="stratEvergreenDetails"></div>
+        <div class="mt-4 pt-4 border-t border-white/10">
+          <p class="text-xs text-gray-500">Ingresos recurrentes</p>
+        </div>
+      </div>
+      <div class="card hover:transform hover:scale-105 transition-transform">
+        <h4 class="font-bold text-lg mb-2 text-pink-400">🎤 Webinar</h4>
+        <div class="text-3xl font-black text-pink-400 mb-4" id="stratWebinarPrice">$0</div>
+        <div class="text-sm text-gray-400" id="stratWebinarDetails"></div>
+        <div class="mt-4 pt-4 border-t border-white/10">
+          <p class="text-xs text-gray-500">Alta autoridad</p>
+        </div>
+      </div>
     </div>
+    <button onclick="exportPDF()" id="exportPdfBtn" class="btn btn-pdf mt-8 hidden w-auto mx-auto block">
+      <i class="fas fa-file-pdf mr-2"></i>Exportar estrategia a PDF
+    </button>
   </div>
 </section>
 
 <!-- Simulador (Premium) -->
 <section id="simulador" class="funcion-premium locked py-16 px-4 gradient-bg">
-  <div class="premium-lock-overlay" id="lock-simulador">
-    <i class="fas fa-lock text-4xl text-amber-400 mb-2"></i>
-    <p class="font-bold text-lg">Función Premium</p>
-    <button onclick="openModal()" class="btn mt-4 px-6 py-2 w-auto text-sm">Activar para desbloquear</button>
+  <div class="premium-lock-overlay" id="lock-simulador" onclick="openModal()">
+    <div class="text-center">
+      <i class="fas fa-lock text-4xl text-amber-400 mb-2"></i>
+      <p class="font-bold text-lg">Simulador de Ingresos Hotmart</p>
+      <p class="text-sm text-gray-300 mt-2">Función Premium - Haz clic para activar</p>
+      <button onclick="openModal(); event.stopPropagation();" class="btn mt-4 px-6 py-2 w-auto text-sm">Activar PRO</button>
+    </div>
   </div>
-  <div class="max-w-7xl mx-auto">
-    <div class="text-center mb-12"><h2 class="text-3xl font-black mb-4">Simulador de <span class="text-amber-400">ingresos</span></h2></div>
+  <div class="max-w-7xl mx-auto" id="content-simulador">
+    <div class="text-center mb-12"><h2 class="text-3xl font-black mb-4">Simulador de <span class="text-amber-400">ingresos</span> Hotmart</h2></div>
     <div class="grid lg:grid-cols-2 gap-8">
       <div class="card">
         <h3 class="text-xl font-bold mb-6">Parámetros</h3>
-        <div class="space-y-4">
-          <div><label class="text-sm text-gray-400 mb-2 block">Unidades a vender</label><input type="range" id="simUnits" min="1" max="1000" value="100" class="w-full" oninput="updateSimulator()"><div class="text-amber-400 font-bold" id="unitsDisplay">100</div></div>
-          <div><label class="text-sm text-gray-400 mb-2 block">Precio por unidad ($)</label><input type="range" id="simPrice" min="7" max="2000" value="97" class="w-full" oninput="updateSimulator()"><div class="text-amber-400 font-bold" id="priceDisplay">$97</div></div>
-          <div><label class="text-sm text-gray-400 mb-2 block">Comisión afiliados (%)</label><input type="number" id="simAffiliate" value="50" min="0" max="100" class="input" oninput="updateSimulator()"></div>
+        <div class="space-y-6">
+          <div>
+            <label class="text-sm text-gray-400 mb-2 block">Unidades a vender</label>
+            <input type="range" id="simUnits" min="1" max="1000" value="100" class="w-full" oninput="updateSimulator()">
+            <div class="text-amber-400 font-bold text-center mt-2" id="unitsDisplay">100 unidades</div>
+          </div>
+          <div>
+            <label class="text-sm text-gray-400 mb-2 block">Precio por unidad ($)</label>
+            <input type="range" id="simPrice" min="7" max="2000" value="97" class="w-full" oninput="updateSimulator()">
+            <div class="text-amber-400 font-bold text-center mt-2" id="priceDisplay">$97</div>
+          </div>
+          <div>
+            <label class="text-sm text-gray-400 mb-2 block">Comisión afiliados (%)</label>
+            <input type="number" id="simAffiliate" value="50" min="0" max="100" class="input" oninput="updateSimulator()">
+          </div>
+          <div>
+            <label class="text-sm text-gray-400 mb-2 block">Inversión en ads ($)</label>
+            <input type="number" id="simAds" value="0" min="0" class="input" oninput="updateSimulator()">
+          </div>
         </div>
       </div>
       <div class="result-card">
         <div class="text-sm text-gray-400 mb-2">Ingresos brutos</div>
         <div class="text-4xl font-black mb-6" id="simGross">$0</div>
         <div class="space-y-3 mb-6">
-          <div class="flex justify-between py-2 border-b border-white/10"><span class="text-gray-400">Comisión Hotmart (9.9%)</span><span class="font-bold text-red-400" id="simHotmartFee">-$0</span></div>
-          <div class="flex justify-between py-2 border-b border-white/10"><span class="text-gray-400">Comisión afiliados</span><span class="font-bold text-red-400" id="simAffiliateFee">-$0</span></div>
-          <div class="flex justify-between py-2 border-b border-white/10"><span class="text-gray-400">Impuestos (10%)</span><span class="font-bold text-red-400" id="simTax">-$0</span></div>
+          <div class="flex justify-between py-2 border-b border-white/10">
+            <span class="text-gray-400">Comisión Hotmart (9.9%)</span>
+            <span class="font-bold text-red-400" id="simHotmartFee">-$0</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-white/10">
+            <span class="text-gray-400">Comisión afiliados</span>
+            <span class="font-bold text-red-400" id="simAffiliateFee">-$0</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-white/10">
+            <span class="text-gray-400">Impuestos (10%)</span>
+            <span class="font-bold text-red-400" id="simTax">-$0</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-white/10" id="adsRow">
+            <span class="text-gray-400">Inversión en ads</span>
+            <span class="font-bold text-red-400" id="simAdsCost">-$0</span>
+          </div>
         </div>
-        <div class="glass-gold rounded-xl p-6"><div class="text-sm text-amber-300 mb-2">💰 Ganancia neta</div><div class="text-5xl font-black text-amber-400" id="simNet">$0</div></div>
+        <div class="glass-gold rounded-xl p-6">
+          <div class="text-sm text-amber-300 mb-2">💰 Ganancia neta por unidad</div>
+          <div class="text-3xl font-black text-amber-400 mb-2" id="simNetPerUnit">$0</div>
+          <div class="text-sm text-amber-300 mb-2">💰 Ganancia neta total</div>
+          <div class="text-5xl font-black text-amber-400" id="simNet">$0</div>
+        </div>
+        <div class="mt-4 p-4 glass rounded-xl">
+          <p class="text-sm text-gray-300">
+            <i class="fas fa-info-circle text-amber-400 mr-2"></i>
+            ROI: <span class="font-bold text-green-400" id="simRoi">0%</span>
+          </p>
+        </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- Copy de Ventas -->
+<section id="copy" class="py-16 px-4 gradient-bg">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-12"><h2 class="text-3xl font-black mb-4">Copy para tu landing</h2></div>
+    <div class="card space-y-6">
+      <div>
+        <h3 class="font-bold text-amber-400 mb-3">📝 Oferta de Lanzamiento</h3>
+        <div class="glass rounded-xl p-4">
+          <p class="mb-2"><strong>🔥 Oferta especial de lanzamiento:</strong></p>
+          <p>Hoy por solo <span class="text-amber-400 font-bold text-xl">$9.90 USD</span> <span class="text-gray-400 line-through">(precio normal $19)</span></p>
+          <p class="mt-2">Acceso inmediato de por vida + actualizaciones gratuitas</p>
+        </div>
+      </div>
+      <div>
+        <h3 class="font-bold text-amber-400 mb-3">✅ Beneficios Principales</h3>
+        <div class="glass rounded-xl p-4 space-y-2">
+          <p>✅ 5 calculadoras especializadas (Curso, Ebook, Membresía, Coaching, Webinar)</p>
+          <p>✅ Generador de estrategia con 3 escenarios probados</p>
+          <p>✅ Simulador de ingresos Hotmart con comisiones reales</p>
+          <p>✅ Reporte PDF exportable para tu equipo</p>
+          <p>✅ App instalable (PWA) - funciona offline</p>
+          <p>✅ Actualizaciones de por vida sin costo extra</p>
+        </div>
+      </div>
+      <div>
+        <h3 class="font-bold text-amber-400 mb-3">🎯 Garantía</h3>
+        <div class="glass rounded-xl p-4">
+          <p><strong>Garantía de 7 días:</strong> Si no estás 100% satisfecho, te devolvemos tu dinero. Sin preguntas.</p>
+        </div>
+      </div>
+      <button onclick="copyText()" class="btn w-auto px-6">
+        <i class="fas fa-copy mr-2"></i>Copiar todo el copy
+      </button>
     </div>
   </div>
 </section>
@@ -227,44 +347,34 @@
   </div>
 </section>
 
-<!-- Copy -->
-<section id="copy" class="py-16 px-4 gradient-bg">
-  <div class="max-w-5xl mx-auto">
-    <div class="text-center mb-12"><h2 class="text-3xl font-black mb-4">Copy para tu landing</h2></div>
-    <div class="card space-y-6">
-      <div>
-        <h3 class="font-bold text-amber-400 mb-3">📝 Oferta</h3>
-        <div class="glass rounded-xl p-4">
-          <strong>🔥 Oferta de lanzamiento:</strong> Hoy por solo <span class="text-amber-400 font-bold text-xl">$9.90 USD (precio normal $19)</span>. Acceso inmediato de por vida.
-        </div>
-      </div>
-      <div>
-        <h3 class="font-bold text-amber-400 mb-3">✅ Beneficios</h3>
-        <div class="glass rounded-xl p-4 space-y-2">
-          <p>✅ 5 calculadoras especializadas</p>
-          <p>✅ Generador de estrategia con 3 escenarios</p>
-          <p>✅ Simulador de ingresos Hotmart</p>
-          <p>✅ Reporte PDF exportable</p>
-          <p>✅ Actualizaciones de por vida</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- Footer -->
 <footer class="border-t border-purple-500/20 py-12 px-4 text-center">
-  <div class="max-w-7xl mx-auto"><p class="text-gray-400">© 2026 PriceCalc Pro. Todos los derechos reservados.</p></div>
+  <div class="max-w-7xl mx-auto">
+    <p class="text-gray-400">© 2026 PriceCalc Pro. Todos los derechos reservados.</p>
+    <p class="text-sm text-gray-500 mt-2">Hecho con ❤️ para creadores digitales</p>
+  </div>
 </footer>
 
 <!-- Modal Licencia -->
-<div id="licenseModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.8);">
-  <div class="glass rounded-2xl p-8 max-w-md w-full relative">
-    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times text-xl"></i></button>
-    <div class="text-center mb-6"><div class="w-16 h-16 mx-auto rounded-2xl gradient-gold flex items-center justify-center mb-4"><i class="fas fa-key text-3xl text-purple-900"></i></div><h3 class="text-2xl font-bold mb-2">Activar licencia PRO</h3></div>
-    <input type="text" id="licenseInput" placeholder="XXXX-XXXX-XXXX" class="input w-full px-4 py-4 rounded-xl text-center text-lg font-mono uppercase mb-4">
+<div id="licenseModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);">
+  <div class="glass rounded-2xl p-8 max-w-md w-full relative border border-amber-400/30">
+    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+    <div class="text-center mb-6">
+      <div class="w-16 h-16 mx-auto rounded-2xl gradient-gold flex items-center justify-center mb-4">
+        <i class="fas fa-key text-3xl text-purple-900"></i>
+      </div>
+      <h3 class="text-2xl font-bold mb-2">Activar licencia PRO</h3>
+      <p class="text-sm text-gray-400">Ingresa tu código de activación</p>
+    </div>
+    <input type="text" id="licenseInput" placeholder="XXXX-XXXX-XXXX" class="input w-full px-4 py-4 rounded-xl text-center text-lg font-mono uppercase mb-4 tracking-wider">
     <div id="licenseError" class="hidden text-red-400 text-sm mb-4 text-center"></div>
-    <button onclick="verificarLicencia(document.getElementById('licenseInput').value.trim().toUpperCase())" class="btn"><i class="fas fa-unlock mr-2"></i>Activar PRO</button>
+    <div id="licenseSuccess" class="hidden text-green-400 text-sm mb-4 text-center"></div>
+    <button onclick="verificarLicencia(document.getElementById('licenseInput').value.trim().toUpperCase())" class="btn">
+      <i class="fas fa-unlock mr-2"></i>Activar PRO
+    </button>
+    <div class="mt-4 text-center">
+      <a href="https://pay.hotmart.com/TU_LINK_AQUI" target="_blank" class="text-amber-400 text-sm hover:underline">¿No tienes licencia? Comprar aquí</a>
+    </div>
   </div>
 </div>
 
@@ -272,35 +382,48 @@
 // ==========================================
 // 1. CONFIGURACIÓN Y ESTADO
 // ==========================================
-const LICENSE_URL = 'https://raw.githubusercontent.com/tenderoalbertalberto-rgb/pricecalc/refs/heads/main/licenses.json';
+const LICENSE_URL = 'https://raw.githubusercontent.com/tenderoalbertalberto-rgb/pricecalc/main/licenses.json';
 let currentCalc = 'curso';
 let deferredPrompt;
+let isPro = false;
 
 // ==========================================
-// 2. SISTEMA DE LICENCIAS SEGURO
+// 2. SISTEMA DE LICENCIAS
 // ==========================================
 function desbloquearPremium() {
+  isPro = true;
+  
+  // Remover locks
   document.querySelectorAll('.funcion-premium').forEach(el => {
     el.classList.remove('locked');
     const overlay = el.querySelector('.premium-lock-overlay');
-    if (overlay) overlay.remove();
+    if (overlay) {
+      overlay.remove();
+    }
   });
   
+  // Mostrar status
   const status = document.getElementById('licenseStatus');
   status.classList.remove('hidden');
   status.classList.add('flex');
-  document.getElementById('licenseText').textContent = 'PRO Activo';
   
+  // Actualizar botón
   const activateBtn = document.getElementById('activateBtn');
-  activateBtn.innerHTML = '✅ PRO Activo';
+  activateBtn.innerHTML = '<i class="fas fa-check mr-1"></i>PRO Activo';
   activateBtn.disabled = true;
   activateBtn.classList.add('opacity-50', 'cursor-not-allowed');
   activateBtn.onclick = null;
+  
+  // Guardar
+  localStorage.setItem('pricecalc_pro_activated', 'true');
 }
 
 function verificarLicencia(codigo) {
   const errorEl = document.getElementById('licenseError');
+  const successEl = document.getElementById('licenseSuccess');
+  
   errorEl.classList.add('hidden');
+  successEl.classList.add('hidden');
   
   if (!codigo) {
     errorEl.textContent = 'Por favor ingresa un código';
@@ -308,6 +431,7 @@ function verificarLicencia(codigo) {
     return;
   }
 
+  // Fetch licenses
   fetch(LICENSE_URL + '?t=' + Date.now())
     .then(res => {
       if (!res.ok) throw new Error('Network error');
@@ -317,16 +441,20 @@ function verificarLicencia(codigo) {
       if (data.valid_licenses && data.valid_licenses.includes(codigo)) {
         localStorage.setItem('pricecalc_pro_activated', 'true');
         localStorage.setItem('pricecalc_license_code', codigo);
-        closeModal();
-        desbloquearPremium();
+        successEl.textContent = '¡Licencia activada exitosamente!';
+        successEl.classList.remove('hidden');
+        setTimeout(() => {
+          closeModal();
+          desbloquearPremium();
+        }, 1000);
       } else {
-        throw new Error('Invalid code');
+        errorEl.textContent = 'Código no válido';
+        errorEl.classList.remove('hidden');
       }
     })
     .catch(err => {
       console.error(err);
-      alert('Código no válido o error de conexión');
-      errorEl.textContent = 'Código no válido o error de conexión';
+      errorEl.textContent = 'Error de conexión. Intenta de nuevo.';
       errorEl.classList.remove('hidden');
     });
 }
@@ -335,6 +463,7 @@ function openModal() {
   document.getElementById('licenseModal').classList.remove('hidden');
   document.getElementById('licenseModal').classList.add('flex');
   document.getElementById('licenseError').classList.add('hidden');
+  document.getElementById('licenseSuccess').classList.add('hidden');
   document.getElementById('licenseInput').value = '';
 }
 
@@ -363,6 +492,13 @@ document.getElementById('installBtn').addEventListener('click', async () => {
   }
 });
 
+// Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(reg => console.log('SW registered'))
+    .catch(err => console.log('SW error:', err));
+}
+
 // ==========================================
 // 4. CONTADOR REGRESIVO (7 Días)
 // ==========================================
@@ -370,24 +506,30 @@ let savedDeadline = localStorage.getItem('pricecalc_deadline');
 if (!savedDeadline) {
   savedDeadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).getTime();
   localStorage.setItem('pricecalc_deadline', savedDeadline);
+} else {
+  savedDeadline = parseInt(savedDeadline);
 }
 
 function updateCountdown() {
   const now = new Date().getTime();
   const distance = savedDeadline - now;
+  
   if (distance < 0) {
     document.getElementById('countdown').innerHTML = "¡Oferta finalizada!";
     return;
   }
+  
   const days = Math.floor(distance / (1000 * 60 * 60 * 24));
   const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  
   document.getElementById('countdown').innerHTML = 
-    `${days}d ${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
+    `${days.toString().padStart(2, '0')}d ${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
 }
+
 setInterval(updateCountdown, 1000);
-updateCountdown(); // Llamada inicial
+updateCountdown();
 
 // ==========================================
 // 5. LÓGICA DE CALCULADORAS
@@ -396,41 +538,41 @@ const configs = {
   curso: {
     title: '📊 Curso Online',
     fields: [
-      {id: 'fixed', label: 'Costos fijos ($)', value: 2000},
-      {id: 'var', label: 'Costo variable por alumno ($)', value: 10},
+      {id: 'fixed', label: 'Costos fijos totales ($)', value: 2000, desc: 'Grabación, plataforma, marketing'},
+      {id: 'var', label: 'Costo variable por alumno ($)', value: 10, desc: 'Soporte, certificados'},
       {id: 'sales', label: 'Ventas objetivo mensuales', value: 50},
       {id: 'margin', label: 'Margen deseado (%)', value: 70},
-      {id: 'value', label: 'Valor al alumno ($/año)', value: 5000},
-      {id: 'capture', label: '% del valor que capturas', value: 10}
+      {id: 'value', label: 'Valor percibido por alumno ($)', value: 5000},
+      {id: 'capture', label: '% del valor que capturas', value: 10, desc: 'Típicamente 5-15%'}
     ]
   },
   ebook: {
-    title: '📚 Ebook',
+    title: ' Ebook',
     fields: [
-      {id: 'fixed', label: 'Costos de creación ($)', value: 500},
-      {id: 'var', label: 'Costo por descarga ($)', value: 0},
+      {id: 'fixed', label: 'Costos de creación ($)', value: 500, desc: 'Diseño, edición, portada'},
+      {id: 'var', label: 'Costo por descarga ($)', value: 0, desc: 'Plataforma, delivery'},
       {id: 'sales', label: 'Ventas objetivo mensuales', value: 200},
       {id: 'margin', label: 'Margen deseado (%)', value: 90},
       {id: 'pages', label: 'Número de páginas', value: 150},
-      {id: 'niche', label: 'Competencia (1-10)', value: 6}
+      {id: 'niche', label: 'Nivel de competencia (1-10)', value: 6, desc: '1=bajo, 10=alto'}
     ]
   },
   membresia: {
     title: '👑 Membresía',
     fields: [
-      {id: 'fixed', label: 'Costos fijos mensuales ($)', value: 1500},
-      {id: 'var', label: 'Costo por miembro/mes ($)', value: 5},
+      {id: 'fixed', label: 'Costos fijos mensuales ($)', value: 1500, desc: 'Plataforma, contenido'},
+      {id: 'var', label: 'Costo por miembro/mes ($)', value: 5, desc: 'Soporte, recursos'},
       {id: 'sales', label: 'Miembros objetivo', value: 100},
       {id: 'margin', label: 'Margen deseado (%)', value: 60},
-      {id: 'churn', label: 'Churn rate mensual (%)', value: 8},
-      {id: 'ltv', label: 'LTV por miembro ($)', value: 500}
+      {id: 'churn', label: 'Churn rate mensual (%)', value: 8, desc: 'Tasa de cancelación'},
+      {id: 'ltv', label: 'LTV por miembro ($)', value: 500, desc: 'Valor de vida del cliente'}
     ]
   },
   coaching: {
-    title: '👥 Coaching 1:1',
+    title: ' Coaching 1:1',
     fields: [
-      {id: 'fixed', label: 'Costos fijos mensuales ($)', value: 800},
-      {id: 'var', label: 'Costo por sesión ($)', value: 20},
+      {id: 'fixed', label: 'Costos fijos mensuales ($)', value: 800, desc: 'Herramientas, marketing'},
+      {id: 'var', label: 'Costo por sesión ($)', value: 20, desc: 'Materiales, plataforma'},
       {id: 'sales', label: 'Clientes objetivo', value: 10},
       {id: 'margin', label: 'Margen deseado (%)', value: 75},
       {id: 'hours', label: 'Horas disponibles/semana', value: 20},
@@ -440,18 +582,20 @@ const configs = {
   webinar: {
     title: '🎤 Webinar',
     fields: [
-      {id: 'fixed', label: 'Costos de producción ($)', value: 300},
-      {id: 'var', label: 'Costo por asistente ($)', value: 2},
+      {id: 'fixed', label: 'Costos de producción ($)', value: 300, desc: 'Plataforma, slides'},
+      {id: 'var', label: 'Costo por asistente ($)', value: 2, desc: 'Ads, emails'},
       {id: 'sales', label: 'Asistentes objetivo', value: 500},
       {id: 'margin', label: 'Margen deseado (%)', value: 80},
-      {id: 'conv', label: 'Tasa de conversión (%)', value: 15},
-      {id: 'upsell', label: 'Valor del upsell ($)', value: 500}
+      {id: 'conv', label: 'Tasa de conversión (%)', value: 15, desc: 'De asistente a venta'},
+      {id: 'upsell', label: 'Valor del upsell ($)', value: 500, desc: 'Producto posterior'}
     ]
   }
 };
 
 function switchCalc(type) {
   currentCalc = type;
+  
+  // Update tabs
   document.querySelectorAll('[id^="tab-"]').forEach(t => {
     t.classList.remove('tab-active');
     t.classList.add('tab');
@@ -459,6 +603,7 @@ function switchCalc(type) {
   document.getElementById('tab-' + type).classList.remove('tab');
   document.getElementById('tab-' + type).classList.add('tab-active');
   
+  // Update form
   const cfg = configs[type];
   document.getElementById('calcTitle').textContent = cfg.title;
   document.getElementById('resultCard').classList.add('hidden');
@@ -466,67 +611,176 @@ function switchCalc(type) {
   
   const form = document.getElementById('calcForm');
   form.innerHTML = cfg.fields.map(f => `
-    <div><label class="text-sm text-gray-400 mb-2 block">${f.label}</label><input type="number" id="f-${f.id}" value="${f.value}" class="input"></div>
+    <div>
+      <label class="text-sm text-gray-400 mb-2 block">${f.label}</label>
+      <input type="number" id="f-${f.id}" value="${f.value}" class="input" step="0.01">
+      ${f.desc ? `<p class="text-xs text-gray-500 mt-1">${f.desc}</p>` : ''}
+    </div>
   `).join('');
 }
 
-// Función auxiliar para leer inputs dinámicamente al hacer clic
 function getInputValue(id) {
   const el = document.getElementById('f-' + id);
   return el ? (parseFloat(el.value) || 0) : 0;
 }
 
 function calcularCurso() {
-  const v = { fixed: getInputValue('fixed'), var: getInputValue('var'), sales: getInputValue('sales'), margin: getInputValue('margin'), value: getInputValue('value'), capture: getInputValue('capture') };
+  const v = {
+    fixed: getInputValue('fixed'),
+    var: getInputValue('var'),
+    sales: getInputValue('sales'),
+    margin: getInputValue('margin'),
+    value: getInputValue('value'),
+    capture: getInputValue('capture')
+  };
+  
   const costPerStudent = (v.fixed / Math.max(1, v.sales)) + v.var;
   let price = costPerStudent / (1 - v.margin/100);
-  price = Math.min(price, v.value * (v.capture/100));
-  return { price: price, min: price * 0.8, max: price * 1.3, margin: v.margin, breakeven: Math.ceil(v.fixed / Math.max(1, price - v.var)), advice: `Con valor percibido de $${v.value}, puedes posicionarte entre $${(price*0.8).toFixed(0)} y $${(price*1.3).toFixed(0)}. Óptimo: $${price.toFixed(0)}.` };
+  const maxPrice = v.value * (v.capture/100);
+  price = Math.min(price, maxPrice);
+  
+  const minPrice = price * 0.8;
+  const maxPriceRange = price * 1.3;
+  const breakeven = Math.ceil(v.fixed / Math.max(1, price - v.var));
+  
+  return {
+    price: price,
+    min: minPrice,
+    max: maxPriceRange,
+    margin: v.margin,
+    breakeven: breakeven,
+    advice: `Con un valor percibido de $${v.value.toLocaleString()}, puedes posicionarte entre $${minPrice.toFixed(0)} y $${maxPriceRange.toFixed(0)}. Tu precio óptimo es $${price.toFixed(0)} para mantener un ${v.margin}% de margen.`
+  };
 }
 
 function calcularEbook() {
-  const v = { fixed: getInputValue('fixed'), var: getInputValue('var'), sales: getInputValue('sales'), margin: getInputValue('margin'), pages: getInputValue('pages'), niche: getInputValue('niche') };
-  const basePrice = (v.pages * 0.15) * (1 + v.niche/20);
+  const v = {
+    fixed: getInputValue('fixed'),
+    var: getInputValue('var'),
+    sales: getInputValue('sales'),
+    margin: getInputValue('margin'),
+    pages: getInputValue('pages'),
+    niche: getInputValue('niche')
+  };
+  
+  // Base price: $0.10-$0.20 per page adjusted by competition
+  const basePrice = (v.pages * 0.15) * (1 + (10 - v.niche)/20);
   let price = basePrice * (1 + v.margin/100);
-  return { price: price, min: price * 0.7, max: price * 1.4, margin: v.margin, breakeven: Math.ceil(v.fixed / Math.max(1, price)), advice: `Ebooks de ${v.pages} páginas con competencia ${v.niche}/10: entre $${(price*0.7).toFixed(0)} y $${(price*1.4).toFixed(0)}. Sugerido: $${price.toFixed(0)}.` };
+  
+  const minPrice = price * 0.7;
+  const maxPriceRange = price * 1.4;
+  const breakeven = Math.ceil(v.fixed / Math.max(1, price - v.var));
+  
+  return {
+    price: price,
+    min: minPrice,
+    max: maxPriceRange,
+    margin: v.margin,
+    breakeven: breakeven,
+    advice: `Un ebook de ${v.pages} páginas con competencia ${v.niche}/10 debería estar entre $${minPrice.toFixed(0)} y $${maxPriceRange.toFixed(0)}. Precio sugerido: $${price.toFixed(0)}.`
+  };
 }
 
 function calcularMembresia() {
-  const v = { fixed: getInputValue('fixed'), var: getInputValue('var'), sales: getInputValue('sales'), margin: getInputValue('margin'), churn: getInputValue('churn'), ltv: getInputValue('ltv') };
+  const v = {
+    fixed: getInputValue('fixed'),
+    var: getInputValue('var'),
+    sales: getInputValue('sales'),
+    margin: getInputValue('margin'),
+    churn: getInputValue('churn'),
+    ltv: getInputValue('ltv')
+  };
+  
   const monthlyCost = (v.fixed / Math.max(1, v.sales)) + v.var;
-  const ltvFactor = 1 / (v.churn/100);
+  const ltvFactor = 1 / (v.churn/100); // Average lifetime in months
   let price = (v.ltv / ltvFactor) * (1 + v.margin/100);
   price = Math.max(price, monthlyCost / (1 - v.margin/100));
-  return { price: price, min: price * 0.85, max: price * 1.25, margin: v.margin, breakeven: Math.ceil(v.fixed / Math.max(1, price - v.var)), advice: `Con churn ${v.churn}%, LTV es $${v.ltv}. Precio mensual óptimo: $${price.toFixed(0)}.` };
+  
+  const minPrice = price * 0.85;
+  const maxPriceRange = price * 1.25;
+  const breakeven = Math.ceil(v.fixed / Math.max(1, price - v.var));
+  
+  return {
+    price: price,
+    min: minPrice,
+    max: maxPriceRange,
+    margin: v.margin,
+    breakeven: breakeven,
+    advice: `Con un churn del ${v.churn}%, el LTV es $${v.ltv}. Precio mensual óptimo: $${price.toFixed(0)}. Necesitas ${breakeven} miembros para cubrir costos.`
+  };
 }
 
 function calcularCoaching() {
-  const v = { fixed: getInputValue('fixed'), var: getInputValue('var'), sales: getInputValue('sales'), margin: getInputValue('margin'), hours: getInputValue('hours'), exp: getInputValue('exp') };
-  const hourlyRate = (v.exp * 50) + 100;
+  const v = {
+    fixed: getInputValue('fixed'),
+    var: getInputValue('var'),
+    sales: getInputValue('sales'),
+    margin: getInputValue('margin'),
+    hours: getInputValue('hours'),
+    exp: getInputValue('exp')
+  };
+  
+  const hourlyRate = (v.exp * 50) + 100; // Base rate by experience
   const costPerClient = (v.fixed / Math.max(1, v.sales)) + v.var;
-  let price = Math.max(hourlyRate * 4, costPerClient / (1 - v.margin/100));
-  return { price: price, min: price * 0.8, max: price * 1.5, margin: v.margin, breakeven: Math.ceil(v.fixed / Math.max(1, price - v.var)), advice: `Con ${v.exp} años experiencia, tarifa base $${hourlyRate}. Paquete mensual: $${price.toFixed(0)}.` };
+  let price = Math.max(hourlyRate * 4, costPerClient / (1 - v.margin/100)); // 4 sessions per month
+  
+  const minPrice = price * 0.8;
+  const maxPriceRange = price * 1.5;
+  const breakeven = Math.ceil(v.fixed / Math.max(1, price - v.var));
+  
+  return {
+    price: price,
+    min: minPrice,
+    max: maxPriceRange,
+    margin: v.margin,
+    breakeven: breakeven,
+    advice: `Con ${v.exp} años de experiencia, tu tarifa base es $${hourlyRate}/hora. Paquete mensual (4 sesiones): $${price.toFixed(0)}.`
+  };
 }
 
 function calcularWebinar() {
-  const v = { fixed: getInputValue('fixed'), var: getInputValue('var'), sales: getInputValue('sales'), margin: getInputValue('margin'), conv: getInputValue('conv'), upsell: getInputValue('upsell') };
+  const v = {
+    fixed: getInputValue('fixed'),
+    var: getInputValue('var'),
+    sales: getInputValue('sales'),
+    margin: getInputValue('margin'),
+    conv: getInputValue('conv'),
+    upsell: getInputValue('upsell')
+  };
+  
   const costPerAttendee = (v.fixed / Math.max(1, v.sales)) + v.var;
   const expectedSales = v.sales * (v.conv/100);
   const revenuePerAttendee = v.upsell * (v.conv/100);
   let price = Math.max(revenuePerAttendee * 0.3, costPerAttendee / (1 - v.margin/100));
-  return { price: price, min: price * 0.5, max: price * 2, margin: v.margin, breakeven: Math.ceil(v.fixed / Math.max(1, price * v.conv/100 - v.var)), advice: `Con ${v.sales} asistentes y ${v.conv}% conversión, genera ~$${(expectedSales * v.upsell).toFixed(0)} en upsells.` };
+  
+  const minPrice = price * 0.5;
+  const maxPriceRange = price * 2;
+  const breakeven = Math.ceil(v.fixed / Math.max(1, price * v.conv/100 - v.var));
+  
+  return {
+    price: price,
+    min: minPrice,
+    max: maxPriceRange,
+    margin: v.margin,
+    breakeven: breakeven,
+    advice: `Con ${v.sales} asistentes y ${v.conv}% de conversión, generarás ~$${(expectedSales * v.upsell).toFixed(0)} en upsells. Precio del webinar: $${price.toFixed(0)}.`
+  };
 }
 
 function calculate() {
   let res;
-  if (currentCalc === 'curso') res = calcularCurso();
-  else if (currentCalc === 'ebook') res = calcularEbook();
-  else if (currentCalc === 'membresia') res = calcularMembresia();
-  else if (currentCalc === 'coaching') res = calcularCoaching();
-  else if (currentCalc === 'webinar') res = calcularWebinar();
+  
+  switch(currentCalc) {
+    case 'curso': res = calcularCurso(); break;
+    case 'ebook': res = calcularEbook(); break;
+    case 'membresia': res = calcularMembresia(); break;
+    case 'coaching': res = calcularCoaching(); break;
+    case 'webinar': res = calcularWebinar(); break;
+    default: return;
+  }
   
   if (!res) return;
-
+  
   const cfg = configs[currentCalc];
   document.getElementById('resultPrice').textContent = '$' + res.price.toFixed(0);
   document.getElementById('resultMin').textContent = '$' + res.min.toFixed(0);
@@ -539,40 +793,76 @@ function calculate() {
   document.getElementById('resultCard').classList.remove('hidden');
   document.getElementById('emptyResult').classList.add('hidden');
 }
+
+// ==========================================
+// 6. GENERADOR DE ESTRATEGIA 360°
+// ==========================================
 function generateStrategy() {
   const value = parseFloat(document.getElementById('stratValue').value) || 2000;
   const audience = parseFloat(document.getElementById('stratAudience').value) || 5000;
   const ads = parseFloat(document.getElementById('stratAds').value) || 1000;
   
+  // Escenario 1: Lanzamiento
   const launchPrice = Math.max(27, value * 0.15);
-  const launchSales = Math.floor(audience * 0.03 * (1 + ads/1000));
-  const launchRevenue = launchSales * launchPrice * 0.901;
+  const launchConv = 0.03 * (1 + ads/2000); // 3% base, aumenta con ads
+  const launchSales = Math.floor(audience * launchConv);
+  const launchRevenue = launchSales * launchPrice;
+  const launchNet = launchRevenue * 0.901; // After Hotmart fee
   
+  // Escenario 2: Evergreen (RECOMENDADO)
   const evergreenPrice = Math.max(47, value * 0.25);
-  const evergreenSales = Math.floor(audience * 0.015 * 0.5);
-  const evergreenRevenue = evergreenSales * evergreenPrice * 0.901 * 30;
+  const evergreenConv = 0.015; // 1.5% mensual
+  const evergreenSales = Math.floor(audience * evergreenConv);
+  const evergreenRevenue = evergreenSales * evergreenPrice;
+  const evergreenNet = evergreenRevenue * 0.901 * 30; // Mensual
   
+  // Escenario 3: Webinar
   const webinarPrice = Math.max(97, value * 0.4);
-  const webinarSales = Math.floor(audience * 0.008 * 0.7);
-  const webinarRevenue = webinarSales * webinarPrice * 0.901;
+  const webinarConv = 0.008 * 0.7; // 0.8% de la audiencia asiste, 70% compra
+  const webinarSales = Math.floor(audience * webinarConv);
+  const webinarRevenue = webinarSales * webinarPrice;
+  const webinarNet = webinarRevenue * 0.901;
   
+  // Mostrar resultados
   document.getElementById('stratLaunchPrice').textContent = '$' + launchPrice.toFixed(0);
   document.getElementById('stratEvergreenPrice').textContent = '$' + evergreenPrice.toFixed(0);
   document.getElementById('stratWebinarPrice').textContent = '$' + webinarPrice.toFixed(0);
   
-  document.getElementById('stratLaunchDetails').innerHTML = `Ventas: ${launchSales}<br>Ingresos: $${launchRevenue.toFixed(0)}`;
-  document.getElementById('stratEvergreenDetails').innerHTML = `Ventas/mes: ${evergreenSales}<br>Ingresos: $${evergreenRevenue.toFixed(0)}`;
-  document.getElementById('stratWebinarDetails').innerHTML = `Ventas: ${webinarSales}<br>Ingresos: $${webinarRevenue.toFixed(0)}`;
+  document.getElementById('stratLaunchDetails').innerHTML = `
+    <p>Ventas estimadas: <strong>${launchSales}</strong></p>
+    <p>Ingresos brutos: <strong>$${launchRevenue.toFixed(0)}</strong></p>
+    <p>Ingresos netos: <strong class="text-green-400">$${launchNet.toFixed(0)}</strong></p>
+    <p class="text-xs mt-2 text-gray-500">Alta conversión inicial (5-7 días)</p>
+  `;
+  
+  document.getElementById('stratEvergreenDetails').innerHTML = `
+    <p>Ventas/mes: <strong>${evergreenSales}</strong></p>
+    <p>Ingresos brutos/mes: <strong>$${evergreenRevenue.toFixed(0)}</strong></p>
+    <p>Ingresos netos/mes: <strong class="text-green-400">$${evergreenNet.toFixed(0)}</strong></p>
+    <p class="text-xs mt-2 text-gray-500">Ingresos recurrentes estables</p>
+  `;
+  
+  document.getElementById('stratWebinarDetails').innerHTML = `
+    <p>Ventas estimadas: <strong>${webinarSales}</strong></p>
+    <p>Ingresos brutos: <strong>$${webinarRevenue.toFixed(0)}</strong></p>
+    <p>Ingresos netos: <strong class="text-green-400">$${webinarNet.toFixed(0)}</strong></p>
+    <p class="text-xs mt-2 text-gray-500">Construye autoridad y confianza</p>
+  `;
   
   document.getElementById('strategyResults').classList.remove('hidden');
+  document.getElementById('exportPdfBtn').classList.remove('hidden');
 }
 
+// ==========================================
+// 7. SIMULADOR DE INGRESOS HOTMART
+// ==========================================
 function updateSimulator() {
   const units = parseInt(document.getElementById('simUnits').value) || 0;
   const price = parseInt(document.getElementById('simPrice').value) || 0;
   const affiliateRate = Math.min(100, Math.max(0, parseFloat(document.getElementById('simAffiliate').value) || 0));
+  const adsCost = parseFloat(document.getElementById('simAds').value) || 0;
   
-  document.getElementById('unitsDisplay').textContent = units;
+  document.getElementById('unitsDisplay').textContent = units + ' unidades';
   document.getElementById('priceDisplay').textContent = '$' + price;
   
   const gross = units * price;
@@ -580,29 +870,167 @@ function updateSimulator() {
   const affiliateFee = gross * (affiliateRate/100);
   const afterFees = gross - hotmartFee - affiliateFee;
   const tax = afterFees * 0.10;
-  const net = Math.max(0, afterFees - tax);
+  const netBeforeAds = afterFees - tax;
+  const net = Math.max(0, netBeforeAds - adsCost);
+  const netPerUnit = units > 0 ? net / units : 0;
+  
+  // ROI calculation
+  const totalCost = adsCost;
+  const roi = totalCost > 0 ? ((net - totalCost) / totalCost) * 100 : 0;
   
   document.getElementById('simGross').textContent = '$' + gross.toLocaleString();
   document.getElementById('simHotmartFee').textContent = '-$' + hotmartFee.toFixed(0);
   document.getElementById('simAffiliateFee').textContent = '-$' + affiliateFee.toFixed(0);
   document.getElementById('simTax').textContent = '-$' + tax.toFixed(0);
+  document.getElementById('simAdsCost').textContent = '-$' + adsCost.toFixed(0);
+  document.getElementById('simNetPerUnit').textContent = '$' + netPerUnit.toFixed(2);
   document.getElementById('simNet').textContent = '$' + net.toFixed(0);
+  document.getElementById('simRoi').textContent = roi.toFixed(1) + '%';
+  document.getElementById('simRoi').className = roi >= 0 ? 'font-bold text-green-400' : 'font-bold text-red-400';
 }
 
 // ==========================================
-// 6. INICIALIZACIÓN
+// 8. EXPORTAR A PDF
+// ==========================================
+async function exportPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  // Configurar colores
+  const primaryColor = [124, 58, 237]; // Purple
+  const secondaryColor = [245, 158, 11]; // Amber
+  
+  // Header
+  doc.setFillColor(...primaryColor);
+  doc.rect(0, 0, 210, 40, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(24);
+  doc.text('PriceCalc Pro', 105, 20, { align: 'center' });
+  doc.setFontSize(14);
+  doc.text('Estrategia de Precios Completa', 105, 30, { align: 'center' });
+  
+  let yPos = 60;
+  
+  // Calculadora actual
+  doc.setTextColor(...primaryColor);
+  doc.setFontSize(16);
+  doc.text(configs[currentCalc].title, 14, yPos);
+  yPos += 10;
+  
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(12);
+  doc.text(`Precio recomendado: ${document.getElementById('resultPrice').textContent}`, 14, yPos);
+  yPos += 8;
+  doc.text(`Rango: ${document.getElementById('resultMin').textContent} - ${document.getElementById('resultMax').textContent}`, 14, yPos);
+  yPos += 8;
+  doc.text(`Margen: ${document.getElementById('resultMargin').textContent}`, 14, yPos);
+  yPos += 8;
+  doc.text(`Punto de equilibrio: ${document.getElementById('resultBreakeven').textContent}`, 14, yPos);
+  yPos += 15;
+  
+  // Estrategia
+  if (!document.getElementById('strategyResults').classList.contains('hidden')) {
+    doc.setFillColor(...secondaryColor);
+    doc.rect(14, yPos - 5, 182, 10, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.text('Estrategia 360°', 105, yPos, { align: 'center' });
+    yPos += 15;
+    
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12);
+    
+    // Lanzamiento
+    doc.text('🚀 Lanzamiento:', 14, yPos);
+    doc.text(`${document.getElementById('stratLaunchPrice').textContent}`, 100, yPos);
+    yPos += 8;
+    
+    // Evergreen
+    doc.text('♾️ Evergreen (Recomendado):', 14, yPos);
+    doc.text(`${document.getElementById('stratEvergreenPrice').textContent}`, 100, yPos);
+    yPos += 8;
+    
+    // Webinar
+    doc.text('🎤 Webinar:', 14, yPos);
+    doc.text(`${document.getElementById('stratWebinarPrice').textContent}`, 100, yPos);
+    yPos += 15;
+  }
+  
+  // Simulador
+  if (isPro) {
+    doc.setFillColor(...primaryColor);
+    doc.rect(14, yPos - 5, 182, 10, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.text('Simulación de Ingresos', 105, yPos, { align: 'center' });
+    yPos += 15;
+    
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.text(`Unidades: ${document.getElementById('unitsDisplay').textContent}`, 14, yPos);
+    yPos += 7;
+    doc.text(`Ingresos brutos: ${document.getElementById('simGross').textContent}`, 14, yPos);
+    yPos += 7;
+    doc.text(`Ganancia neta: ${document.getElementById('simNet').textContent}`, 14, yPos);
+    yPos += 7;
+    doc.text(`ROI: ${document.getElementById('simRoi').textContent}`, 14, yPos);
+  }
+  
+  // Footer
+  doc.setTextColor(128, 128, 128);
+  doc.setFontSize(10);
+  doc.text('Generado por PriceCalc Pro - ' + new Date().toLocaleDateString(), 105, 280, { align: 'center' });
+  
+  // Guardar
+  doc.save('pricecalc-estrategia-' + new Date().getTime() + '.pdf');
+}
+
+// ==========================================
+// 9. COPY DE VENTAS
+// ==========================================
+function copyText() {
+  const copy = `🔥 OFERTA DE LANZAMIENTO - PriceCalc Pro
+
+Precio especial: $9.90 USD (normal $19)
+
+✅ LO QUE INCLUYE:
+• 5 calculadoras especializadas (Curso, Ebook, Membresía, Coaching, Webinar)
+• Generador de estrategia con 3 escenarios probados
+• Simulador de ingresos Hotmart con comisiones reales
+• Reporte PDF exportable
+• App instalable (PWA) - funciona offline
+• Actualizaciones de por vida
+
+📊 RESULTADOS:
+"La inversión de $9.90 se pagó sola el primer día" - María G.
+
+🎯 GARANTÍA:
+7 días de garantía. Si no estás satisfecho, te devolvemos tu dinero.
+
+👉 Compra ahora: [TU_LINK_AQUI]`;
+
+  navigator.clipboard.writeText(copy).then(() => {
+    alert('¡Copy copiado al portapapeles!');
+  });
+}
+
+// ==========================================
+// 10. INICIALIZACIÓN
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+  // Check license
   if (localStorage.getItem('pricecalc_pro_activated') === 'true') {
     desbloquearPremium();
   }
+  
+  // Init calculator
   switchCalc('curso');
+  
+  // Init simulator
   updateSimulator();
   
-  // Registrar Service Worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
+  // Countdown
+  updateCountdown();
 });
 </script>
 </body>

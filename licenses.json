@@ -1,14 +1,11 @@
 {
   "valid_licenses": [
     "HOTMART-PRO-2026",
-    "PREMIUM-2026",
-    "GOLD-2026",
-    "ELITE-2026",
-    "VIP-2026",
-    "CREATOR-2026"
+    "CREADOR-EXITO-99",
+    "PRICECALC-VIP-01"
   ],
   "metadata": {
-    "version": "2.0",
+    "version": "1.0",
     "product": "PriceCalc Pro"
   }
 }

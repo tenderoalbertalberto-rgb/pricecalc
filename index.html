@@ -61,12 +61,12 @@
     </div>
     <div class="flex items-center gap-3">
       <button id="installBtn" class="hidden btn px-4 py-2 text-sm w-auto" style="background: linear-gradient(135deg, #10B981, #059669); color: white;">
-        <i class="fas fa-download mr-1"></i>📲 Instalar
+        <i class="fas fa-download mr-1"></i> Instalar
       </button>
       <div id="licenseStatus" class="hidden items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold glass-gold">
         <i class="fas fa-crown text-amber-400"></i><span id="licenseText">PRO</span>
       </div>
-      <button onclick="openModal()" id="activateBtn" class="btn px-4 py-2 text-sm w-auto" style="cursor: pointer;"><i class="fas fa-key mr-1"></i>Activar PRO</button>
+      <button type="button" onclick="openModal(event)" id="activateBtn" class="btn px-4 py-2 text-sm w-auto" style="cursor: pointer;"><i class="fas fa-key mr-1"></i>Activar PRO</button>
     </div>
   </div>
 </header>
@@ -84,14 +84,14 @@
       
       <!-- Contador Regresivo -->
       <div class="glass-gold rounded-xl p-4 mb-6 text-center border border-amber-400/30">
-        <p class="text-amber-300 font-bold text-lg mb-1">⏳ Oferta de lanzamiento termina en:</p>
+        <p class="text-amber-300 font-bold text-lg mb-1"> Oferta de lanzamiento termina en:</p>
         <p id="countdown" class="text-3xl font-black text-white tracking-wider">00d 00h 00m 00s</p>
       </div>
 
       <p class="text-lg text-purple-200 mb-8">5 calculadoras especializadas, estrategia de precios y simulador de ingresos.</p>
       <div class="flex flex-wrap gap-4">
         <a href="#calculadora" class="btn px-8 py-4 w-auto inline-block text-center"><i class="fas fa-rocket mr-2"></i>Empezar gratis</a>
-        <button onclick="openModal()" class="btn px-8 py-4 w-auto inline-block text-center" style="background: linear-gradient(135deg, #7C3AED, #5B21B6); color: #fff; cursor: pointer;"><i class="fas fa-crown mr-2"></i>Comprar PRO - $9.90</button>
+        <button type="button" onclick="openModal(event)" class="btn px-8 py-4 w-auto inline-block text-center" style="background: linear-gradient(135deg, #7C3AED, #5B21B6); color: #fff; cursor: pointer;"><i class="fas fa-crown mr-2"></i>Comprar PRO - $9.90</button>
       </div>
     </div>
     <div class="relative">
@@ -121,18 +121,18 @@
     <div class="text-center mb-12"><h2 class="text-3xl font-black mb-4">Calculadora <span class="text-amber-400">especializada</span></h2></div>
     
     <div class="flex flex-wrap gap-2 mb-8 justify-center">
-      <button onclick="switchCalc('curso')" id="tab-curso" class="tab tab-active px-5 py-3 rounded-xl">📊 Curso</button>
-      <button onclick="switchCalc('ebook')" id="tab-ebook" class="tab px-5 py-3 rounded-xl">📚 Ebook</button>
-      <button onclick="switchCalc('membresia')" id="tab-membresia" class="tab px-5 py-3 rounded-xl">👑 Membresía</button>
-      <button onclick="switchCalc('coaching')" id="tab-coaching" class="tab px-5 py-3 rounded-xl">👥 Coaching</button>
-      <button onclick="switchCalc('webinar')" id="tab-webinar" class="tab px-5 py-3 rounded-xl">🎤 Webinar</button>
+      <button type="button" onclick="switchCalc('curso')" id="tab-curso" class="tab tab-active px-5 py-3 rounded-xl">📊 Curso</button>
+      <button type="button" onclick="switchCalc('ebook')" id="tab-ebook" class="tab px-5 py-3 rounded-xl">📚 Ebook</button>
+      <button type="button" onclick="switchCalc('membresia')" id="tab-membresia" class="tab px-5 py-3 rounded-xl"> Membresía</button>
+      <button type="button" onclick="switchCalc('coaching')" id="tab-coaching" class="tab px-5 py-3 rounded-xl">👥 Coaching</button>
+      <button type="button" onclick="switchCalc('webinar')" id="tab-webinar" class="tab px-5 py-3 rounded-xl"> Webinar</button>
     </div>
 
     <div class="grid lg:grid-cols-2 gap-8">
       <div class="card">
-        <h3 id="calcTitle" class="text-2xl font-bold mb-6">📊 Curso Online</h3>
+        <h3 id="calcTitle" class="text-2xl font-bold mb-6"> Curso Online</h3>
         <div id="calcForm" class="space-y-4"></div>
-        <button onclick="calculate()" class="btn mt-6"><i class="fas fa-rocket mr-2"></i>Calcular precio óptimo</button>
+        <button type="button" onclick="calculate()" class="btn mt-6"><i class="fas fa-rocket mr-2"></i>Calcular precio óptimo</button>
       </div>
 
       <div id="resultCard" class="result-card hidden">
@@ -145,7 +145,7 @@
           <div class="glass rounded-xl p-4"><div class="text-xs text-gray-400 mb-1">Margen neto</div><div class="text-xl font-bold text-green-400" id="resultMargin">0%</div></div>
           <div class="glass rounded-xl p-4"><div class="text-xs text-gray-400 mb-1">Punto de equilibrio</div><div class="text-xl font-bold" id="resultBreakeven">0 ventas</div></div>
         </div>
-        <div class="glass rounded-xl p-4"><div class="text-xs text-gray-400 mb-2"> Recomendación</div><p class="text-sm" id="resultAdvice">-</p></div>
+        <div class="glass rounded-xl p-4"><div class="text-xs text-gray-400 mb-2">💡 Recomendación</div><p class="text-sm" id="resultAdvice">-</p></div>
       </div>
 
       <div id="emptyResult" class="card text-center">
@@ -158,12 +158,12 @@
 
 <!-- Estrategia (Premium) -->
 <section id="estrategia" class="funcion-premium locked py-16 px-4">
-  <div class="premium-lock-overlay" id="lock-estrategia" onclick="openModal()">
+  <div class="premium-lock-overlay" id="lock-estrategia">
     <div class="text-center">
       <i class="fas fa-lock text-4xl text-amber-400 mb-2"></i>
       <p class="font-bold text-lg">Generador de Estrategia 360°</p>
       <p class="text-sm text-gray-300 mt-2">Función Premium - Haz clic para activar</p>
-      <button onclick="openModal(); event.stopPropagation();" class="btn mt-4 px-6 py-2 w-auto text-sm">Activar PRO</button>
+      <button type="button" onclick="openModal(event)" class="btn mt-4 px-6 py-2 w-auto text-sm">Activar PRO</button>
     </div>
   </div>
   <div class="max-w-7xl mx-auto" id="content-estrategia">
@@ -175,11 +175,11 @@
         <div><label class="text-sm text-gray-400 mb-2 block">Audiencia (seguidores)</label><input type="number" id="stratAudience" value="5000" class="input"></div>
         <div><label class="text-sm text-gray-400 mb-2 block">Presupuesto ads ($)</label><input type="number" id="stratAds" value="1000" class="input"></div>
       </div>
-      <button onclick="generateStrategy()" class="btn mt-6"><i class="fas fa-magic mr-2"></i>Generar estrategia</button>
+      <button type="button" onclick="generateStrategy()" class="btn mt-6"><i class="fas fa-magic mr-2"></i>Generar estrategia</button>
     </div>
     <div id="strategyResults" class="grid md:grid-cols-3 gap-6 hidden">
       <div class="card hover:transform hover:scale-105 transition-transform">
-        <h4 class="font-bold text-lg mb-2 text-blue-400">🚀 Lanzamiento</h4>
+        <h4 class="font-bold text-lg mb-2 text-blue-400"> Lanzamiento</h4>
         <div class="text-3xl font-black text-blue-400 mb-4" id="stratLaunchPrice">$0</div>
         <div class="text-sm text-gray-400" id="stratLaunchDetails"></div>
         <div class="mt-4 pt-4 border-t border-white/10">
@@ -206,7 +206,7 @@
         </div>
       </div>
     </div>
-    <button onclick="exportPDF()" id="exportPdfBtn" class="btn btn-pdf mt-8 hidden w-auto mx-auto block">
+    <button type="button" onclick="exportPDF()" id="exportPdfBtn" class="btn btn-pdf mt-8 hidden w-auto mx-auto block">
       <i class="fas fa-file-pdf mr-2"></i>Exportar estrategia a PDF
     </button>
   </div>
@@ -214,12 +214,12 @@
 
 <!-- Simulador (Premium) -->
 <section id="simulador" class="funcion-premium locked py-16 px-4 gradient-bg">
-  <div class="premium-lock-overlay" id="lock-simulador" onclick="openModal()">
+  <div class="premium-lock-overlay" id="lock-simulador">
     <div class="text-center">
       <i class="fas fa-lock text-4xl text-amber-400 mb-2"></i>
       <p class="font-bold text-lg">Simulador de Ingresos Hotmart</p>
       <p class="text-sm text-gray-300 mt-2">Función Premium - Haz clic para activar</p>
-      <button onclick="openModal(); event.stopPropagation();" class="btn mt-4 px-6 py-2 w-auto text-sm">Activar PRO</button>
+      <button type="button" onclick="openModal(event)" class="btn mt-4 px-6 py-2 w-auto text-sm">Activar PRO</button>
     </div>
   </div>
   <div class="max-w-7xl mx-auto" id="content-simulador">
@@ -316,7 +316,7 @@
           <p><strong>Garantía de 7 días:</strong> Si no estás 100% satisfecho, te devolvemos tu dinero. Sin preguntas.</p>
         </div>
       </div>
-      <button onclick="copyText()" class="btn w-auto px-6">
+      <button type="button" onclick="copyText()" class="btn w-auto px-6">
         <i class="fas fa-copy mr-2"></i>Copiar todo el copy
       </button>
     </div>
@@ -358,7 +358,7 @@
 <!-- Modal Licencia -->
 <div id="licenseModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);">
   <div class="glass rounded-2xl p-8 max-w-md w-full relative border border-amber-400/30">
-    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+    <button type="button" onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
     <div class="text-center mb-6">
       <div class="w-16 h-16 mx-auto rounded-2xl gradient-gold flex items-center justify-center mb-4">
         <i class="fas fa-key text-3xl text-purple-900"></i>
@@ -369,7 +369,7 @@
     <input type="text" id="licenseInput" placeholder="XXXX-XXXX-XXXX" class="input w-full px-4 py-4 rounded-xl text-center text-lg font-mono uppercase mb-4 tracking-wider">
     <div id="licenseError" class="hidden text-red-400 text-sm mb-4 text-center"></div>
     <div id="licenseSuccess" class="hidden text-green-400 text-sm mb-4 text-center"></div>
-    <button onclick="verificarLicencia(document.getElementById('licenseInput').value.trim().toUpperCase())" class="btn">
+    <button type="button" onclick="verificarLicencia(document.getElementById('licenseInput').value.trim().toUpperCase())" class="btn">
       <i class="fas fa-unlock mr-2"></i>Activar PRO
     </button>
     <div class="mt-4 text-center">
@@ -459,18 +459,51 @@ function verificarLicencia(codigo) {
     });
 }
 
-function openModal() {
-  document.getElementById('licenseModal').classList.remove('hidden');
-  document.getElementById('licenseModal').classList.add('flex');
+function openModal(event) {
+  // Prevenir cualquier comportamiento por defecto
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  
+  const modal = document.getElementById('licenseModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
   document.getElementById('licenseError').classList.add('hidden');
   document.getElementById('licenseSuccess').classList.add('hidden');
   document.getElementById('licenseInput').value = '';
+  
+  // Prevenir scroll del body
+  document.body.style.overflow = 'hidden';
+  
+  // Focus en el input
+  setTimeout(() => {
+    document.getElementById('licenseInput').focus();
+  }, 100);
 }
 
 function closeModal() {
-  document.getElementById('licenseModal').classList.add('hidden');
-  document.getElementById('licenseModal').classList.remove('flex');
+  const modal = document.getElementById('licenseModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  
+  // Restaurar scroll del body
+  document.body.style.overflow = 'auto';
 }
+
+// Cerrar modal al hacer clic fuera
+document.getElementById('licenseModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeModal();
+  }
+});
+
+// Cerrar modal con tecla ESC
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeModal();
+  }
+});
 
 // ==========================================
 // 3. PWA INSTALABLE
@@ -547,7 +580,7 @@ const configs = {
     ]
   },
   ebook: {
-    title: ' Ebook',
+    title: '📚 Ebook',
     fields: [
       {id: 'fixed', label: 'Costos de creación ($)', value: 500, desc: 'Diseño, edición, portada'},
       {id: 'var', label: 'Costo por descarga ($)', value: 0, desc: 'Plataforma, delivery'},
@@ -569,7 +602,7 @@ const configs = {
     ]
   },
   coaching: {
-    title: ' Coaching 1:1',
+    title: '👥 Coaching 1:1',
     fields: [
       {id: 'fixed', label: 'Costos fijos mensuales ($)', value: 800, desc: 'Herramientas, marketing'},
       {id: 'var', label: 'Costo por sesión ($)', value: 20, desc: 'Materiales, plataforma'},
@@ -1004,7 +1037,7 @@ Precio especial: $9.90 USD (normal $19)
 📊 RESULTADOS:
 "La inversión de $9.90 se pagó sola el primer día" - María G.
 
-🎯 GARANTÍA:
+ GARANTÍA:
 7 días de garantía. Si no estás satisfecho, te devolvemos tu dinero.
 
 👉 Compra ahora: [TU_LINK_AQUI]`;
